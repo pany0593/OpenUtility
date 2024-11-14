@@ -9,7 +9,7 @@ public class PostService {
 
     public String createArticleId() {}
 
-    public void addArticle(String articleId, String title, String desc) {};
+    public void addArticle(String articleId, String title, String desc, String content) {};
 
     public Article getArticle(String articleId) {};
 

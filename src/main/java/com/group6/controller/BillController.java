@@ -15,8 +15,8 @@ public class BillController {
     @Autowired
     private BillService billService;
 
-    @PostMapping("/addBill")
-    public Result addBill(@RequestBody Bill bill) {
+    @PostMapping("/add")
+    public Result add(@RequestBody Bill bill) {
         if (billService.addBill(bill)) {
             return Result.success();
         } else {
@@ -24,8 +24,8 @@ public class BillController {
         }
     }
 
-    @PostMapping("/deleteBill")
-    public Result deleteBill(@RequestParam String id) {
+    @PostMapping("/delete")
+    public Result delete(@RequestParam String id) {
         if (billService.deleteBill(id)) {
             return Result.success();
         } else {
@@ -33,8 +33,8 @@ public class BillController {
         }
     }
 
-    @PostMapping("/updateBill")
-    public Result updateBill(@RequestBody Bill bill) {
+    @PostMapping("/update")
+    public Result update(@RequestBody Bill bill) {
         if (billService.updateBill(bill)) {
             return Result.success();
         } else {

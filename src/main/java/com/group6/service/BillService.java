@@ -13,6 +13,7 @@ public class BillService {
     @Autowired
     private BillMapper billMapper;
 
+
     public boolean addBill(Bill bill) {
         return billMapper.insertBill(bill) > 0;
     }

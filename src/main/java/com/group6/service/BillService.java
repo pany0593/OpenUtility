@@ -16,7 +16,6 @@ public class BillService {
     public boolean addBill(Bill bill) {
         return billMapper.insertBill(bill) > 0;
     }
-
     public boolean deleteBill(String id) {
         return billMapper.deleteBill(id) > 0;
     }

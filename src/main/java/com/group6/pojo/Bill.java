@@ -11,10 +11,9 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class Bill {
 
-
+    private int month;
     private int year;
     private int id;
-    private int month;
     private int days;
     private int building;
     private int dormitory;

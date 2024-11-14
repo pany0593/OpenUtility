@@ -8,12 +8,11 @@ import java.math.BigDecimal;
 @Mapper
 public interface BillMapper {
 
+    @Delete("DELETE FROM bill WHERE id = #{id}")
+    int deleteBill(@Param("id") String id);
     @Insert("INSERT INTO bill (id, year, month, days, building, dormitory, electricity_usage, electricity_cost, water_usage, water_cost, total_cost) " +
             "VALUES (#{id}, #{year}, #{month}, #{days}, #{building}, #{dormitory}, #{electricityUsage}, #{electricityCost}, #{waterUsage}, #{waterCost}, #{totalCost})")
     int insertBill(Bill bill);
-
-    @Delete("DELETE FROM bill WHERE id = #{id}")
-    int deleteBill(@Param("id") String id);
 
     @Update("UPDATE bill SET year = #{year}, month = #{month}, days = #{days}, building = #{building}, dormitory = #{dormitory}, " +
             "electricity_usage = #{electricityUsage}, electricity_cost = #{electricityCost}, water_usage = #{waterUsage}, water_cost = #{waterCost}, total_cost = #{totalCost} WHERE id = #{id}")

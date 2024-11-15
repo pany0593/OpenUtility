@@ -1,12 +1,11 @@
 package com.group6.service;
 
-        import com.group6.mapper.BillMapper;
-        import com.group6.pojo.Bill;
-        import com.group6.pojo.Result;
-        import org.springframework.beans.factory.annotation.Autowired;
-        import org.springframework.stereotype.Service;
+import com.group6.mapper.BillMapper;
+import com.group6.pojo.Bill;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-        import java.math.BigDecimal;
+import java.math.BigDecimal;
 
 @Service
 public class BillService {
@@ -14,34 +13,31 @@ public class BillService {
     @Autowired
     private BillMapper billMapper;
 
-    public void addBill(Bill bill) {
-        billMapper.insertBill(bill);
+
+    public boolean addBill(Bill bill) {
+        return billMapper.insertBill(bill) > 0;
+    }
+    public boolean deleteBill(String id) {
+        return billMapper.deleteBill(id) > 0;
     }
 
-    public void deleteBill(String id) {
-        billMapper.deleteBillById(id);
+    public boolean updateBill(Bill bill) {
+        return billMapper.updateBill(bill) > 0;
     }
 
-    public void updateBill(Bill bill) {
-        billMapper.updateBill(bill);
-    }
-
-    public Bill getBillById(String id) {
+    public Bill getBill(String id) {
         return billMapper.selectBillById(id);
     }
 
-    public BigDecimal countByDormitory(int dormitory, int start_year, int start_month, int end_year, int end_month) {
-        // 实现统计逻辑
-        return new BigDecimal(0);
+    public BigDecimal countByDormitory(int dormitory, int startYear, int startMonth, int endYear, int endMonth) {
+        return billMapper.sumElectricityAndWaterCostByDormitory(dormitory, startYear, startMonth, endYear, endMonth);
     }
 
-    public BigDecimal countByBuilding(int building, int start_year, int start_month, int end_year, int end_month) {
-        // 实现统计逻辑
-        return new BigDecimal(0);
+    public BigDecimal countByBuilding(int building, int startYear, int startMonth, int endYear, int endMonth) {
+        return billMapper.sumElectricityAndWaterCostByBuilding(building, startYear, startMonth, endYear, endMonth);
     }
 
-    public BigDecimal countBySchool(int start_year, int start_month, int end_year, int end_month) {
-        // 实现统计逻辑
-        return new BigDecimal(0);
+    public BigDecimal countBySchool(int startYear, int startMonth, int endYear, int endMonth) {
+        return billMapper.sumElectricityAndWaterCostBySchool(startYear, startMonth, endYear, endMonth);
     }
 }

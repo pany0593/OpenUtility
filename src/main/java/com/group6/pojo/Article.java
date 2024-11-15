@@ -12,6 +12,7 @@ public class Article {
     private String title;
     private String authorId;
     private String authorName;
+    private String article_content;
     private String desc;
     private String createTime;
     private Integer likes;

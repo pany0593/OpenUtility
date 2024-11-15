@@ -9,7 +9,7 @@ import javax.xml.transform.Result;
 @RequestMapping("/post")
 public class PostController {
 
-    @PostMapping("/article_upload")
+    @PostMapping("/article_add")
     public Result addarticle(String title, String content) {}
 
     @GetMapping("/article_get")

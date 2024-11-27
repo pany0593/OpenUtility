@@ -18,6 +18,8 @@ CREATE TABLE `user` (
   `id` varchar(30) NOT NULL,
   `username` varchar(50) NOT NULL,
   `password` varchar(50) NOT NULL,
+  `email` VARCHAR(100),
+  `avatar` VARCHAR(1024),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 

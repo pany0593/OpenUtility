@@ -5,7 +5,8 @@ import lombok.Data;
 
 @AllArgsConstructor
 @Data
-public class Base {
+public class Base <T>{
     private Integer code;
     private String message;
+    private T data;
 }

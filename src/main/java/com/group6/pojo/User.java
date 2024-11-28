@@ -1,19 +1,37 @@
 package com.group6.pojo;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Column;
+import lombok.*;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+
 public class User {
+
+    @Id
     private Long id;  // 用户ID
+
     private String username;  // 用户名
     private String password;  // 密码
-    private String email;  // 邮箱
-    private String avatar;  // 用户头像路径
 
+    @Column(nullable = true)
+    private String email;  // 邮箱
+    @Column(name = "avatar_path", length = 1024)
+    private String avatarPath;  // 用户头像路径
+
+
+
+/*
     /**
      * 无参构造函数
      *
-     */
+     * /
     public User() {
     }
-
     /**
      * 全参构造函数
      *
@@ -22,7 +40,7 @@ public class User {
      * @param password
      * @param email
      * @param avatar
-     */
+     * /
     public User(Long id, String username, String password, String email, String avatar) {
         this.id = id;
         this.username = username;
@@ -30,12 +48,11 @@ public class User {
         this.email = email;
         this.avatar = avatar;
     }
-
     /**
      *Getter 和 Setter 方法
      *
      * @return
-     */
+     * /
     public Long getId() {
         return id;
     }
@@ -85,5 +102,6 @@ public class User {
                 ", avatar='" + avatar + '\'' +
                 '}';
     }
+*/
 
 }

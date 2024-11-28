@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class Bill {
 
-    private int id;
+    private String id;
     private int month;
     private int year;
     private int days;

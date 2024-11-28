@@ -17,6 +17,7 @@ public class BillController {
 
     @PostMapping("/add")
     public Result add(@RequestBody Bill bill) {
+
         if (billService.addBill(bill)) {
             return Result.success();
         } else {
@@ -25,8 +26,8 @@ public class BillController {
     }
 
     @PostMapping("/delete")
-    public Result delete(@RequestParam String id) {
-        if (billService.deleteBill(id)) {
+    public Result delete(@RequestBody Bill bill) {
+        if (billService.deleteBill(bill)) {
             return Result.success();
         } else {
             return Result.error("Failed to delete bill");
@@ -43,8 +44,8 @@ public class BillController {
     }
 
     @GetMapping("/getData")
-    public Result<Bill> getData(@RequestParam String id) {
-        Bill bill = billService.getBill(id);
+    public Result<Bill> getData(@RequestBody Bill bbill) {
+        Bill bill = billService.getBill(bbill);
         return bill != null ? Result.success(bill) : Result.error("Bill not found");
     }
 

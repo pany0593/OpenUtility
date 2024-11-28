@@ -4,7 +4,7 @@ import com.group6.pojo.Comment;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
-
+@Mapper
 public interface CommentMapper {//Comment表
 
     @Insert("insert into Comment (commentId , fatherId , userId , content , createTime , level) " +

@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
+@Mapper
 public interface ArticleMapper {//Article表
     @Insert("INSERT INTO Article (articleId, authorId, title, `desc`, content,clicks,createTime) " +
             "VALUES (#{articleId}, #{authorId}, #{title}, #{desc}, #{content},#{clicks},CURRENT_TIMESTAMP")

@@ -1,9 +1,7 @@
 package com.group6.pojo;
 
 import com.group6.response.Base;
-import java.lang.Integer;
 import java.lang.String;
-import java.lang.Object;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -8,7 +8,6 @@ import com.group6.pojo.Comment;
 import com.group6.service.PostService;
 import com.group6.response.GetArticleListResponse;
 
-import java.io.IOException;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

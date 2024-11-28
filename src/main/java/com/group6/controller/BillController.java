@@ -5,8 +5,8 @@ import com.group6.pojo.Result;
 import com.group6.service.BillService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import java.math.BigDecimal;
+
 
 @RestController
 @RequestMapping("/bill")
@@ -17,39 +17,42 @@ public class BillController {
 
     @PostMapping("/add")
     public Result add(@RequestBody Bill bill) {
-
-        if (billService.addBill(bill)) {
+        try {
+            billService.addBill(bill);
             return Result.success();
-        } else {
-            return Result.error("Failed to add bill");
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
         }
     }
-
     @PostMapping("/delete")
-    public Result delete(@RequestBody Bill bill) {
-        if (billService.deleteBill(bill)) {
+    public Result delete(@RequestBody String id) {
+        try {
+            billService.deleteBill(id);
             return Result.success();
-        } else {
-            return Result.error("Failed to delete bill");
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
         }
     }
 
     @PostMapping("/update")
     public Result update(@RequestBody Bill bill) {
-        if (billService.updateBill(bill)) {
+        try {
+            billService.updateBill(bill);
             return Result.success();
-        } else {
-            return Result.error("Failed to update bill");
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
         }
+
     }
-
-
-
 
     @GetMapping("/getData")
     public Result<Bill> getData(@RequestBody Bill bbill) {
-        Bill bill = billService.getBill(bbill);
-        return bill != null ? Result.success(bill) : Result.error("Bill not found");
+        try {
+            Bill bill = billService.getBill(bbill);
+            return Result.success();
+        } catch (IllegalArgumentException e) {
+            return Result.error(e.getMessage());
+        }
     }
 
     @GetMapping("/count_dormitory")

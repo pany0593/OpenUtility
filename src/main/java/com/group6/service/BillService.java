@@ -3,9 +3,11 @@ package com.group6.service;
 import com.group6.mapper.BillMapper;
 import com.group6.pojo.Bill;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Service
 public class BillService {
@@ -14,15 +16,26 @@ public class BillService {
     private BillMapper billMapper;
 
 
-    public boolean addBill(Bill bill) {
-        return billMapper.insertBill(bill) > 0;
+    public void addBill(Bill bill) {
+        UUID uuid = UUID.randomUUID();
+        long uniqueId = uuid.getMostSignificantBits() & Long.MAX_VALUE;
+        String billId=""+uniqueId;
+        bill.setId(billId);
     }
-    public boolean deleteBill(Bill bill) {
-        return billMapper.deleteBill(bill) > 0;
+    public void deleteBill(String id) throws Exception {
+
+        try {
+            if(billMapper.deleteBill(id) == 0)
+            {
+                throw new Exception("删除错误");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public boolean updateBill(Bill bill) {
-        return billMapper.updateBill(bill) > 0;
+    public void updateBill(Bill bill) {
+        billMapper.updateBill(bill);
     }
 
     public Bill getBill(Bill bill) {

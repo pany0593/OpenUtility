@@ -43,6 +43,9 @@ public class BillController {
         }
     }
 
+
+
+
     @GetMapping("/getData")
     public Result<Bill> getData(@RequestBody Bill bbill) {
         Bill bill = billService.getBill(bbill);

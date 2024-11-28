@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Objects;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,8 +14,10 @@ public class Article {
     private String title;
     private String authorId;
     private String authorName;
-    private String article_content;
     private String desc;
+    private String content;
     private String createTime;
-    private Integer likes;
+    private int likes = 0;
+    private int clicks = 0;
+
 }

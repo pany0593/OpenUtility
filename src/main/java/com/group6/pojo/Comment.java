@@ -15,9 +15,9 @@ public class Comment {
     private String fatherId;
     private String userId;
     private String userName;
-    private String comment_content;
+    private String content;
     private String createTime;
-    private Integer likes;
-    private Integer level;
+    private int likes = 0;
+    private int level;
     private List<Comment> subComments;
 }

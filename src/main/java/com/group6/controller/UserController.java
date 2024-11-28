@@ -1,6 +1,5 @@
 package com.group6.controller;
 
-import com.group6.response.Base;
 import com.group6.pojo.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -20,12 +19,8 @@ public class UserController {
      */
     @PostMapping("/register")
     public Result registerUser(@RequestBody User user) {
-        try {
-            userService.registerUser(user);
-            return Result.success(user);
-        } catch (IllegalArgumentException e) {
-            return Result.error(e.getMessage());
-        }
+        userService.registerUser(user);
+        return Result.success(user);
     }
 
 

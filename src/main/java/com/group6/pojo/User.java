@@ -1,26 +1,26 @@
 package com.group6.pojo;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Column;
-import lombok.*;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+//@Entity
 
 public class User {
 
-    @Id
+//    @Id
     private Long id;  // 用户ID
 
     private String username;  // 用户名
     private String password;  // 密码
 
-    @Column(nullable = true)
+//    @Column(nullable = true)
     private String email;  // 邮箱
-    @Column(name = "avatar_path", length = 1024)
+//    @Column(name = "avatar_path", length = 1024)
     private String avatarPath;  // 用户头像路径
 
 

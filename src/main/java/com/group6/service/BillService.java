@@ -17,16 +17,16 @@ public class BillService {
     public boolean addBill(Bill bill) {
         return billMapper.insertBill(bill) > 0;
     }
-    public boolean deleteBill(String id) {
-        return billMapper.deleteBill(id) > 0;
+    public boolean deleteBill(Bill bill) {
+        return billMapper.deleteBill(bill) > 0;
     }
 
     public boolean updateBill(Bill bill) {
         return billMapper.updateBill(bill) > 0;
     }
 
-    public Bill getBill(String id) {
-        return billMapper.selectBillById(id);
+    public Bill getBill(Bill bill) {
+        return billMapper.selectBillById(bill);
     }
 
     public BigDecimal countByDormitory(int dormitory, int startYear, int startMonth, int endYear, int endMonth) {

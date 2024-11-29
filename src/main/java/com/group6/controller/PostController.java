@@ -23,19 +23,23 @@ public class PostController {
 
     //发帖(done)
     @PostMapping("/article_add")//done
-    public Result article_add(String title, String content, String desc) {
-        String articleId = postService.createArticleId();
-        if (postService.createArticle(articleId, title, content, desc)){
-            return Result.success();
-        } else {
-            return Result.error("Fail to add article");
+    public Result article_add(Article article) {
+        try {
+            article.setArticleId(postService.createArticleId());
+            if(postService.createArticle(article) != 0){
+                return Result.success(article.getArticleId());
+            } else {
+                return Result.error("fail to add article");
+            }
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
         }
     }
 
     //删帖(done)
     @PostMapping("/article_delete")//done
-    public Result article_delete(@RequestParam String id) {
-        if (postService.deleteArticle(id)) {
+    public Result article_delete(Article article) {
+        if (postService.deleteArticle(article)) {
             return Result.success();
         } else {
             return Result.error("Failed to delete article");
@@ -44,7 +48,7 @@ public class PostController {
 
     //更新帖子(done)
     @PostMapping("/article_update")//done
-    public Result article_update(@RequestBody Article article) {
+    public Result article_update(Article article) {
         if (postService.updateArticle(article)) {
             return Result.success();
         } else {
@@ -54,39 +58,38 @@ public class PostController {
 
     //点赞文章(done)
     @PostMapping("/article_like")
-    public Result likeArticle(String articleId) {
-        Article article = postService.findByArticleId(articleId);
+    public Result likeArticle(Article article0) {
+        Article article = postService.findByArticleId(article0.getArticleId());
         if (article == null) {
             return Result.error("Failed to find article");
         }
         List<Article> likesArticle = postService.getLikesByUserId();//service层未实现//已实现
         for (Article tmpArticle : likesArticle) {
-            if (tmpArticle.getArticleId().equals(articleId)) {
+            if (tmpArticle.getArticleId().equals(article0.getArticleId())) {
                 return Result.error("already liked");
             }
         }
-        postService.likeArticle(articleId);
+        postService.likeArticle(article0.getArticleId());
         return Result.success();
     }
 
     //发表评论(done)
     @PostMapping("/comment_add")//done
-    public Result comment_add(String fatherId, String content, int level) {
-        String commentId = postService.addComment(fatherId, content, level);
-        Comment comment=postService.findByCommentId(commentId);
-        return Result.success(comment);
+    public Result comment_add(Comment comment) {
+        String commentId = postService.addComment(comment);
+        return Result.success(postService.findByCommentId(commentId));
     }
 
     //删除评论(done)
     @PostMapping("/comment_delete")
-    public Result comment_delete(@RequestParam String id) {
-        Comment comment = postService.findByCommentId(id);
+    public Result comment_delete(Comment comment0) {
+        Comment comment = postService.findByCommentId(comment0.getCommentId());
         if (comment.getLevel() == 2) {
-            if (postService.delete_level2_Comment(id)) {
+            if (postService.delete_level2_Comment(comment0.getCommentId())) {
                 return Result.success();
             }
         } else {
-            if (postService.delete_level1_Comment(id)) {
+            if (postService.delete_level1_Comment(comment0.getCommentId())) {
                 return Result.success();
             }
         }
@@ -95,37 +98,37 @@ public class PostController {
 
     //点赞评论(done)
     @PostMapping("/comment_like")
-    private Result likeComment(String commentId){
-        Comment comment=postService.findByCommentId(commentId);
+    private Result likeComment(Comment comment0){
+        Comment comment=postService.findByCommentId(comment0.getCommentId());
         if(comment==null){
             return Result.error("fail to find comment");
         }
         List<Comment> favoriteComments = postService.getFavoriteCommentByUserId();
         for (Comment tmpComment:favoriteComments) {
-            if(tmpComment.getCommentId().equals(commentId)){
+            if(tmpComment.getCommentId().equals(comment0.getCommentId())){
                 return Result.error("already liked");
             }
         }
-        postService.likeComment(commentId);
+        postService.likeComment(comment0.getCommentId());//点赞
         return Result.success();
     }
 
 
     //查看文章(done)
     @GetMapping("/article_get")
-    public Result getArticle(String articleId) {
-        Article article = postService.findByArticleId(articleId);
+    public Result getArticle(Article article0) {
+        Article article = postService.findByArticleId(article0.getArticleId());
         if (article == null) {
             return Result.error("fail to find article");
         }
-        postService.addClicks(articleId);
-        return Result.success(article.getContent());//直接返回文章内容,不需要Response?
+        postService.addClicks(article.getArticleId());
+        return Result.success(article);//直接返回文章内容,不需要Response?
     }
 
-    //查看文章评论(done)
+    //查看评论(done)
     @GetMapping("/comment_get")
-    private Result getComment(String articleId){
-        List<Comment> comments = postService.getCommentByArticleId(articleId);
+    private Result getComment(Article article){
+        List<Comment> comments = postService.getCommentByArticleId(article.getArticleId());
         return Result.success(comments);
     }
 
@@ -142,5 +145,4 @@ public class PostController {
         int articleNum=postService.getArticleNum();
         return Result.success(new GetArticleListResponse(articles, (int) Math.ceil((double) articleNum /pagesPerPage)));
     }
-
 }

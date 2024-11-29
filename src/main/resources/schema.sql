@@ -62,7 +62,7 @@ CREATE TABLE `comment` (
                         `commentId` varchar(30) NOT NULL,
                         `fatherId` varchar(30) NOT NULL,
                         `userId` varchar(30) NOT NULL,
-                        `userName` varchar(50) NOT NULL,
+                        `userName` varchar(30) NOT NULL,
                         `content` varchar(100) NOT NULL,
                         `createTime` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
                         `likes` int DEFAULT 0,

@@ -39,10 +39,8 @@ jobs:
         # 登录到 ECS 并运行应用
         ssh -i ecs_key.pem -tt $ECS_USER@$ECS_HOST << 'EOF'
         
-        cd $APP_PATH
-        
+        cd /home/openutility
         pkill -f 'java -jar' || true  
-        
         nohup java -jar app.jar > app.log 2>&1 &
         exit
         EOF

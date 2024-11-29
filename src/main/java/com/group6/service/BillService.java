@@ -3,8 +3,6 @@ package com.group6.service;
 import com.group6.mapper.BillMapper;
 import com.group6.pojo.Bill;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
-
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -35,6 +33,15 @@ public class BillService {
     }
 
     public void updateBill(Bill bill) {
+
+        try {
+            if(billMapper.findBillById(bill.getId()) == null)
+            {
+                throw new Exception("没有这条记录");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         billMapper.updateBill(bill);
     }
 

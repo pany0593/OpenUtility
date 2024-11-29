@@ -1,6 +1,7 @@
 package com.group6.mapper;
 
 import com.group6.pojo.Bill;
+import com.group6.pojo.User;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.annotations.Param;
 import java.math.BigDecimal;
@@ -10,6 +11,8 @@ import java.util.Map;
 @Mapper
 public interface BillMapper {
 
+    @Select("SELECT * FROM water_electricity_bill WHERE id = #{id}")
+    User findBillById(@Param("id") String id);
 
     @Insert("INSERT INTO water_electricity_bill (id,year,month,days,building,dormitory,electricity_usage,electricity_cost,water_usage,water_cost,total_cost) " +
             "VALUES (#{bill.id}, #{bill.year}, #{bill.month}, #{bill.days}, #{bill.building}, #{bill.dormitory}, #{bill.electricity_usage}, #{bill.electricity_cost}, #{bill.water_usage}, #{bill.water_cost}, #{bill.total_cost})")

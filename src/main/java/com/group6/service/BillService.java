@@ -33,8 +33,7 @@ public class BillService {
     public void deleteBill(Bill bill) {
 
         try {
-            if(billMapper.findBillById(bill.getId()) == null)
-            {
+            if(billMapper.findBillById(bill.getId()) == null) {
                 throw new Exception("删除错误,记录不存在");
             }
         } catch (Exception e) {

@@ -67,8 +67,7 @@ CREATE TABLE `comment` (
                         `createTime` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
                         `likes` int DEFAULT 0,
                         PRIMARY KEY (`commentId`),
-                        FOREIGN KEY (`userId`) REFERENCES `user` (`id`),
-                        FOREIGN KEY (`userName`) REFERENCES `user` (`username`)
+                        FOREIGN KEY (`userId`) REFERENCES `user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 

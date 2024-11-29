@@ -19,7 +19,16 @@ public class BillService {
         UUID uuid = UUID.randomUUID();
         long uniqueId = uuid.getMostSignificantBits() & Long.MAX_VALUE;
         String billId=""+uniqueId;
+        billId="bill"+billId;
         bill.setId(billId);
+        try {
+            if(billMapper.findBillById(bill.getId()) != null) {
+                throw new Exception("编号重复");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        billMapper.insertBill(bill);
     }
     public void deleteBill(String id) throws Exception {
 
@@ -46,6 +55,13 @@ public class BillService {
     }
 
     public Bill getBill(Bill bill) {
+        try {
+            if(billMapper.findBillById(bill.getId()) == null) {
+                throw new Exception("没有这条记录");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return billMapper.selectBillById(bill);
     }
 

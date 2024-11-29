@@ -50,7 +50,7 @@ public class BillController {
     public Result<Bill> getData(@RequestBody Bill bbill) {
         try {
             Bill bill = billService.getBill(bbill);
-            return Result.success();
+            return Result.success(bill);
         } catch (IllegalArgumentException e) {
             return Result.error(e.getMessage());
         }

@@ -14,8 +14,10 @@ public interface UserMapper {
      *
      * @param user 用户对象
      */
-    @Insert("INSERT INTO user (username, email, avatar) VALUES (#{user.username}, #{user.email}, #{user.avatar})")
+    @Insert("INSERT INTO user (id, username, password, email, avatar) " +
+            "VALUES (#{user.id}, #{user.username}, #{user.password}, #{user.email}, #{user.avatar})")
     void insertUser(@Param("user") User user);
+
 
     /**
      * 根据用户名查找用户
@@ -33,7 +35,7 @@ public interface UserMapper {
      * @return 用户对象
      */
     @Select("SELECT * FROM user WHERE id = #{userId}")
-    User findUserById(@Param("userId") Long userId);
+    User findUserById(@Param("userId") String userId);
 
     /**
      * 更新用户头像
@@ -42,5 +44,5 @@ public interface UserMapper {
      * @param avatarPath 头像路径
      */
     @Update("UPDATE user SET avatar = #{avatarPath} WHERE id = #{userId}")
-    void updateUserAvatar(@Param("userId") Long userId, @Param("avatarPath") String avatarPath);
+    void updateUserAvatar(@Param("userId") String userId, @Param("avatarPath") String avatarPath);
 }

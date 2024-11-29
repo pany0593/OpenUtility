@@ -17,7 +17,7 @@ MySQL - 8.0.32 : Database - openutility
 CREATE TABLE `user` (
   `id` varchar(30) NOT NULL,
   `username` varchar(50) NOT NULL,
-  `password` varchar(50) NOT NULL,
+  `password` varchar(500) NOT NULL,
   `email` VARCHAR(100),
   `avatar` VARCHAR(1024),
   PRIMARY KEY (`id`)

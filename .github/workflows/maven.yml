@@ -41,7 +41,11 @@ jobs:
 
         # 登录到 ECS 并运行应用
         ssh -i ecs_key.pem $ECS_USER@$ECS_HOST << 'EOF'
-        pkill -f 'java -jar' || true            # 停止已有应用（可选）
-        nohup java -jar $APP_PATH/app.jar > $APP_PATH/app.log 2>&1 &
+        docker stop app || true
+        docker rm app || true
+
+        # 运行新的容器
+        docker run -p 8080:8080 --name app --network app_network -v /home/openutility:/app -v /home/openutility/logs:/app/logs -d openjdk:17 sh -c "java -jar /app/app.jar"
+
         exit
         EOF

@@ -18,8 +18,8 @@ public interface BillMapper {
             "VALUES (#{bill.id}, #{bill.year}, #{bill.month}, #{bill.days}, #{bill.building}, #{bill.dormitory}, #{bill.electricity_usage}, #{bill.electricity_cost}, #{bill.water_usage}, #{bill.water_cost}, #{bill.total_cost})")
     int insertBill(@Param("bill") Bill bill);
 
-    @Delete("DELETE FROM water_electricity_bill WHERE id = #{id}")
-    int deleteBill(@Param("id") String id);
+    @Delete("DELETE FROM water_electricity_bill WHERE id = #{bill.id}")
+    int deleteBill(@Param("bill") Bill bill);
 
     @Update("UPDATE water_electricity_bill SET year = #{bill.year}, month = #{bill.month}, days = #{bill.days}, building = #{bill.building}, dormitory = #{bill.dormitory}, " +
             "electricity_usage = #{bill.electricity_usage}, electricity_cost = #{bill.electricity_cost}, water_usage = #{bill.water_usage}, water_cost = #{bill.water_cost}, total_cost = #{bill.total_cost} WHERE id = #{bill.id}")

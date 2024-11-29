@@ -30,16 +30,17 @@ public class BillService {
         }
         billMapper.insertBill(bill);
     }
-    public void deleteBill(String id) throws Exception {
+    public void deleteBill(Bill bill) {
 
         try {
-            if(billMapper.deleteBill(id) == 0)
+            if(billMapper.findBillById(bill.getId()) == null)
             {
-                throw new Exception("删除错误");
+                throw new Exception("删除错误,记录不存在");
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        billMapper.deleteBill(bill);
     }
 
     public void updateBill(Bill bill) {

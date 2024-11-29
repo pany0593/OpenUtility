@@ -43,7 +43,7 @@ CREATE TABLE `water_electricity_bill` (
 
 /*Table structure for post */
 
-CREATE TABLE `water_electricity_article` (
+CREATE TABLE `article` (
                         `articleId` varchar(30) NOT NULL,
                         `title` varchar(255) NOT NULL,
                         `content` text NOT NULL,
@@ -56,7 +56,7 @@ CREATE TABLE `water_electricity_article` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
-CREATE TABLE `water_electricity_comment` (
+CREATE TABLE `comment` (
                         `commentId` varchar(30) NOT NULL,
                         `fatherId` varchar(30) NOT NULL,
                         `userId` varchar(30) NOT NULL,
@@ -74,7 +74,7 @@ CREATE TABLE `favorite_article` (
                         `articleId` varchar(30) NOT NULL,
                         `userId` varchar(30) NOT NULL,
                         CONSTRAINT `post_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `user` (`id`),
-                        CONSTRAINT `post_ibfk_1` FOREIGN KEY (`articleId`) REFERENCES `water_electricity_article` (`articleId`),
+                        CONSTRAINT `post_ibfk_1` FOREIGN KEY (`articleId`) REFERENCES `article` (`articleId`),
                         PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -84,7 +84,7 @@ CREATE TABLE `favorite_comment` (
                         `commentId` varchar(30) NOT NULL,
                         `userId` varchar(30) NOT NULL,
                         CONSTRAINT `post_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `user` (`id`),
-                        CONSTRAINT `post_ibfk_1` FOREIGN KEY (`commentId`) REFERENCES `water_electricity_comment` (`commentId`),
+                        CONSTRAINT `post_ibfk_1` FOREIGN KEY (`commentId`) REFERENCES `comment` (`commentId`),
                         PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 

@@ -2,6 +2,7 @@ package com.group6.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,6 +30,7 @@ public class SecurityConfig {
                 .and()
                 .csrf().disable() // 如果不需要 CSRF 保护，可以禁用
                 .authorizeHttpRequests(authorize -> authorize
+                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 允许预检请求
 //                        .requestMatchers("/bill/add").permitAll() // 开放 /bill/add 路由
 //                        .anyRequest().authenticated() // 其他路由需要认证
                                 .anyRequest().permitAll()
@@ -50,4 +52,5 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration); // 应用于所有路由
         return source;
     }
+
 }

@@ -7,6 +7,7 @@ import com.group6.pojo.User;
 import com.group6.service.UserService;
 
 
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -42,7 +43,7 @@ public class UserController {
      * 获取用户信息接口
      */
     @GetMapping("/{userId}/profile")
-    public Result getUserProfile(@PathVariable Long userId) {
+    public Result getUserProfile(@PathVariable String userId) {
         User user = userService.getUserById(userId);
         if (user != null) {
             return Result.success(user);
@@ -52,10 +53,10 @@ public class UserController {
     }
 
     /**
-     * 更新用户头像接口
+     * 用户头像接口
      */
     @PostMapping("/{userId}/avatar")
-    public Result updateUserAvatar(@PathVariable Long userId, @RequestParam("avatar") String avatar) {
+    public Result updateUserAvatar(@PathVariable String userId, @RequestParam("avatar") String avatar) {
         try {
             userService.updateUserAvatar(userId, avatar);
             return Result.success();

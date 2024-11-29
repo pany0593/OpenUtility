@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.UUID;
-
+import org.apache.ibatis.exceptions.PersistenceException;
 
 @Service
 public class UserService {
@@ -32,21 +32,62 @@ public class UserService {
      *
      * @param user
      */
+//    public void registerUser(User user) {
+//        if (userExists(user.getUsername())) {
+//            throw new IllegalArgumentException("User already exists");
+//        }
+//        // 使用 UUID 生成 String 类型的用户 ID
+//        UUID uuid = UUID.randomUUID();
+//        String uniqueId = uuid.toString();
+//        user.setId(uniqueId);
+//        //加密密码
+//        user.setPassword(passwordEncoder.encode(user.getPassword()));
+//        //添加默认头像
+//        if (user.getAvatarPath() == null || user.getAvatarPath().isEmpty()) {
+//            user.setAvatarPath(generateDefaultAvatar());
+//        }
+//        saveUserToDatabase(user);
+//    }
     public void registerUser(User user) {
+        // 校验 user 对象及必要字段
+        if (user == null) {
+            throw new IllegalArgumentException("User object cannot be null");
+        }
+        if (user.getUsername() == null || user.getUsername().trim().isEmpty()) {
+            throw new IllegalArgumentException("Username cannot be null or empty");
+        }
+        if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
+            throw new IllegalArgumentException("Password cannot be null or empty");
+        }
+
         if (userExists(user.getUsername())) {
             throw new IllegalArgumentException("User already exists");
         }
-        // 使用 UUID 的部分哈希值生成 Long 类型的用户 ID
-        UUID uuid = UUID.randomUUID();
-        long uniqueId = uuid.getMostSignificantBits() & Long.MAX_VALUE;
-        user.setId(uniqueId);
-        //加密密码
+
+        // 设置默认值
+        user.setId(UUID.randomUUID().toString().substring(0, 30));
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        //添加默认头像
-        if (user.getAvatarPath() == null || user.getAvatarPath().isEmpty()) {
-            user.setAvatarPath(generateDefaultAvatar());
+        if (user.getEmail() == null) {
+            user.setEmail("default@example.com");
         }
-        saveUserToDatabase(user);
+        if (user.getAvatar() == null || user.getAvatar().isEmpty()) {
+            user.setAvatar(generateDefaultAvatar());
+        }
+
+        try {
+            userMapper.insertUser(user);
+        } catch (PersistenceException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof java.sql.SQLIntegrityConstraintViolationException) {
+                throw new IllegalArgumentException("User already exists or data integrity violation");
+            }
+            if (cause != null) {
+                throw new IllegalArgumentException("Persistence error: " + cause.getMessage());
+            }
+            throw new IllegalArgumentException("Persistence error occurred, but cause is null");
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Unexpected error occurred: " + (e.getMessage() != null ? e.getMessage() : "Unknown error"));
+        }
     }
 
     /**
@@ -79,7 +120,7 @@ public class UserService {
      * @param userId
      * @return
      */
-    public User getUserById(Long userId) {
+    public User getUserById(String userId) {
         return findUserById(userId);
     }
 
@@ -89,10 +130,10 @@ public class UserService {
      * @param userId
      * @param avatar
      */
-    public void updateUserAvatar(Long userId, String avatar) {
+    public void updateUserAvatar(String userId, String avatar) {
         User user = findUserById(userId);
         if (user != null) {
-            user.setAvatarPath(avatar);
+            user.setAvatar(avatar);
             updateUserInDatabase(user);
         } else {
             throw new IllegalArgumentException("User not found");
@@ -140,7 +181,7 @@ public class UserService {
      * @param userId
      * @return
      */
-    private User findUserById(Long userId) {
+    private User findUserById(String userId) {
         return userMapper.findUserById(userId);
     }
 
@@ -160,6 +201,10 @@ public class UserService {
      * @param user
      */
     private void updateUserInDatabase(User user) {
-        userMapper.updateUserAvatar(user.getId(), user.getAvatarPath());
+        userMapper.updateUserAvatar(user.getId(), user.getAvatar());
     }
+
+    private class DataIntegrityViolationException extends Throwable {
+    }
+
 }

@@ -42,9 +42,9 @@ public class UserController {
     /**
      * 获取用户信息接口
      */
-    @GetMapping("/{userId}/profile")
-    public Result getUserProfile(@PathVariable String userId) {
-        User user = userService.getUserById(userId);
+    @GetMapping("/{id}/profile")
+    public Result getUserProfile(@PathVariable String id) {
+        User user = userService.getUserById(id);
         if (user != null) {
             return Result.success(user);
         } else {
@@ -55,10 +55,10 @@ public class UserController {
     /**
      * 用户头像接口
      */
-    @PostMapping("/{userId}/avatar")
-    public Result updateUserAvatar(@PathVariable String userId, @RequestParam("avatar") String avatar) {
+    @PostMapping("/{id}/avatar")
+    public Result updateUserAvatar(@PathVariable String id, @RequestParam("avatar") String avatar) {
         try {
-            userService.updateUserAvatar(userId, avatar);
+            userService.updateUserAvatar(id, avatar);
             return Result.success();
         } catch (IllegalArgumentException e) {
             return Result.error(e.getMessage());

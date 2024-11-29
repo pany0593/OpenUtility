@@ -65,7 +65,7 @@ public class UserService {
         }
 
         // 设置默认值
-        user.setId(UUID.randomUUID().toString().substring(0, 30));
+        user.setId(UUID.randomUUID().toString().replaceAll("-", "").substring(0, 30));
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         if (user.getEmail() == null) {
             user.setEmail("default@example.com");
@@ -75,7 +75,7 @@ public class UserService {
         }
 
         try {
-            userMapper.insertUser(user);
+            saveUserToDatabase(user);
         } catch (PersistenceException e) {
             Throwable cause = e.getCause();
             if (cause instanceof java.sql.SQLIntegrityConstraintViolationException) {
@@ -117,21 +117,21 @@ public class UserService {
     /**
      * 根据用户 ID 获取用户信息
      *
-     * @param userId
+     * @param id
      * @return
      */
-    public User getUserById(String userId) {
-        return findUserById(userId);
+    public User getUserById(String id) {
+        return findUserById(id);
     }
 
     /**
      * 更新用户头像
      *
-     * @param userId
+     * @param id
      * @param avatar
      */
-    public void updateUserAvatar(String userId, String avatar) {
-        User user = findUserById(userId);
+    public void updateUserAvatar(String id, String avatar) {
+        User user = findUserById(id);
         if (user != null) {
             user.setAvatar(avatar);
             updateUserInDatabase(user);
@@ -147,7 +147,7 @@ public class UserService {
      * @return
      */
     public String generateDefaultAvatar() {
-        return "https://www.bing.com/images/search?view=detailV2&ccid=lb3OzXaN&id=E6F375AFBF9A0D0650205779FC0AF42D31DDDA50&thid=OIP.lb3OzXaNmiUsTlJMSddldAHaHa&mediaurl=https%3A%2F%2Fp3-pc-sign.douyinpic.com%2Ftos-cn-i-0813%2FoAYAQf7vtgN9DeAQAToEABCCYAFFIVlnnTD4AA%7Enoop.jpeg%3Fbiz_tag%3Dpcweb_cover%26from%3D327834062%26s%3DPackSourceEnum_SEARCH%26se%3Dfalse%26x-expires%3D1731229200%26x-signature%3D3xU62jASl7qEgAW1UHBprBxT1E4%253D&exph=1440&expw=1440&q=%E9%A5%BA%E5%AD%90%E6%81%B6%E6%90%9E%E4%B9%8B%E5%AE%B6%E5%A4%B4%E5%83%8F&FORM=IRPRST&ck=36105F80E6B207A6F8D3BD34F16A1C19&selectedIndex=89&itb=0&cw=1397&ch=647&ajaxhist=0&ajaxserp=0";
+        return "https://th.bing.com/th/id/OIP.lb3OzXaNmiUsTlJMSddldAHaHa?rs=1&pid=ImgDetMain";
     }
     private boolean authenticateUser(String username, String password) {
         User user = findUserByUsername(username);
@@ -178,11 +178,11 @@ public class UserService {
     /**
      * 根据用户 ID 查找用户
      *
-     * @param userId
+     * @param id
      * @return
      */
-    private User findUserById(String userId) {
-        return userMapper.findUserById(userId);
+    private User findUserById(String id) {
+        return userMapper.findUserById(id);
     }
 
     /**
@@ -204,7 +204,6 @@ public class UserService {
         userMapper.updateUserAvatar(user.getId(), user.getAvatar());
     }
 
-    private class DataIntegrityViolationException extends Throwable {
-    }
+
 
 }

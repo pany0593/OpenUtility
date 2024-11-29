@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 @Mapper
-public interface FavoriteMapper {//favorite_article表和favorite_comment表
+public interface FavoriteMapper {//用户的favorite_article表和favorite_comment表
     @Select("select userId,articleId from favorite_article where userId = #{userId}")
     List<Favorite> getFavoriteArticleByUserId(String userId);//查询用户点赞过的文章
 

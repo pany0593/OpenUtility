@@ -37,14 +37,19 @@ public class PostService {
     }
 
     //创建文章
-    public boolean createArticle(String articleId, String title, String content, String desc) {
-        String authorId= (String) threadLocalUtil.get("userId");
-        return articleMapper.insertArticle(articleId,title,content,authorId,desc) > 0;
+    public int createArticle(Article article) {
+//        String authorId= (String) threadLocalUtil.get("userId");
+        try {
+            int x = articleMapper.insertArticle(article);
+            return x;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     //删除文章
-    public boolean deleteArticle(String articleId) {
-        return articleMapper.deleteArticle(articleId) > 0;
+    public boolean deleteArticle(Article article) {
+        return articleMapper.deleteArticle(article) > 0;
     }
 
     //更新文章
@@ -54,10 +59,16 @@ public class PostService {
 
 
     //发表评论
-    public String addComment(String articleId, String content, int level) {
+    public String addComment(Comment comment) {
         String userId = (String) threadLocalUtil.get("userId");
         String commentId="CM"+snowFlakeUtils.nextId();
-        commentMapper.addComment(commentId,articleId,userId,content,level);
+        comment.setCommentId(commentId);
+        String cp = "CM";
+        if (findByCommentId(commentId).getFatherId().regionMatches(0, cp, 0, 2)){//比较fatherId是否是articleId来确认是一级还是二级评论
+            commentMapper.add_level2_Comment(comment);
+        } else {
+            commentMapper.add_level1_Comment(comment);
+        }
         return commentId;
     }
 
@@ -81,14 +92,12 @@ public class PostService {
 
     //查看文章评论
     public List<Comment> getCommentByArticleId(String articleId) {
-        List<Comment> comments = commentMapper.findFirstByArticleId(articleId);
-        for (Comment comment:comments) {
+        List<Comment> comments = commentMapper.findFirstByArticleId(articleId);//生成一级评论列表
+        for (Comment comment:comments) {//循环生成每个二级评论列表
             comment.setSubComments(commentMapper.findSecondByCommentId(comment.getCommentId()));
-//            comment.setUserName(userService.getNameById(comment.getUserId()));        //由UserService实现
         }
         return comments;
     }
-
 
     public List<Article> getList(Integer page, Integer sort,Integer pagesPerPage) {
         List<Article> articles;
@@ -97,10 +106,6 @@ public class PostService {
         }else{
             articles=articleMapper.getListByClick((page - 1) * pagesPerPage, pagesPerPage);
         }
-/*        for (Article article:articles) {
-            article.setAuthorName(userService.getNameById(article.getAuthorId()));      //由UserService实现
-        }
-*/
         return articles;
     }
 

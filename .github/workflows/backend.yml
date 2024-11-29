@@ -1,0 +1,46 @@
+name: OpenUtility-CI/DI
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
+
+    # 部署到 ECS
+    - name: Deploy to ECS
+      env:
+        ECS_HOST: ${{ secrets.ECS_HOST }}         # ECS 的公网 IP
+        ECS_USER: ${{ secrets.ECS_USER }}         # SSH 用户名
+        ECS_KEY: ${{ secrets.ECS_KEY }}           # SSH 私钥
+        APP_PATH: "/home/openutility"             # ECS 上的目标路径
+      run: |
+        # 添加私钥到 SSH 配置
+        echo "${ECS_KEY}" > ecs_key.pem
+        chmod 600 ecs_key.pem
+        # 使用 ssh-keyscan 信任 ECS 主机
+        mkdir -p ~/.ssh
+        ssh-keyscan -H $ECS_HOST >> ~/.ssh/known_hosts
+        # 上传构建产物到 ECS
+        scp -i ecs_key.pem target/*.jar $ECS_USER@$ECS_HOST:$APP_PATH/app.jar
+        # 登录到 ECS 并运行应用
+        ssh -i ecs_key.pem -tt $ECS_USER@$ECS_HOST << 'EOF'
+        
+        cd /home/openutility
+        pkill -f 'java -jar' || true  
+        nohup java -jar app.jar > app.log 2>&1 &
+        exit
+        EOF

@@ -20,4 +20,26 @@ public class Article {
     private int likes = 0;
     private int clicks = 0;
 
+//    public Article(String title, String authorId, String authorName, String desc, String content) {
+//        this.title = title;
+//        this.authorId = authorId;
+//        this.authorName = authorName;
+//        this.desc = desc;
+//        this.content = content;
+//    }
+
+    @Override
+    public String toString() {
+        return "Article{" +
+                "articleId='" + articleId + '\'' +
+                ", title='" + title + '\'' +
+                ", authorId='" + authorId + '\'' +
+                ", authorName='" + authorName + '\'' +
+                ", desc='" + desc + '\'' +
+                ", content='" + content + '\'' +
+                ", createTime='" + createTime + '\'' +
+                ", likes=" + likes +
+                ", clicks=" + clicks +
+                '}';
+    }
 }

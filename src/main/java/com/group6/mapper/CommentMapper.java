@@ -7,28 +7,32 @@ import java.util.List;
 @Mapper
 public interface CommentMapper {//Comment表
 
-    @Insert("insert into Comment (commentId , fatherId , userId , content , createTime , level) " +
-            "values (#{commentId} , #{fatherId} , #{userId} , #{content} , CURRENT_TIMESTAMP, #{level})")
-    void addComment(String commentId, String fatherId, String userId, String content, Integer level);
+    @Insert("insert into comment (commentId , fatherId , userId ,userName, content , createTime , level) " +
+            "values (#{commentId} , #{fatherId} , #{userId} ,#{userName}, #{content} , CURRENT_TIMESTAMP, 1)")
+    void add_level1_Comment(Comment comment);
 
-    @Select("select commentId,fatherId,userId,content,createTime,likes,level,avatarUrl from Comment where commentId = #{commentId} ")
+    @Insert("insert into comment (commentId , fatherId , userId , userName, content , createTime , level) " +
+            "values (#{commentId} , #{fatherId} , #{userId} , #{userName}, #{content} , CURRENT_TIMESTAMP, 2)")
+    void add_level2_Comment(Comment comment);
+
+    @Select("select commentId,fatherId,userId,userName,content,createTime,likes,level,avatarUrl from comment where commentId = #{commentId} ")
     Comment findByCommentId(String commentId);
 
-    @Delete("DELETE FROM Comment WHERE commentId = #{commentId} and level = 2")
+    @Delete("DELETE FROM comment WHERE commentId = #{commentId} and level = 2")
     int delete_level2_Comment(String commentId);//删除二级评论本身
 
-    @Delete("DELETE FROM Comment WHERE fatherId = #{commentId} and level = 2")
+    @Delete("DELETE FROM comment WHERE fatherId = #{commentId} and level = 2")
     int delete_son_Comment(String commentId);//删除一级评论的子评论
 
-    @Delete("DELETE FROM Comment WHERE commentId = #{commentId} and level = 1")
+    @Delete("DELETE FROM comment WHERE commentId = #{commentId} and level = 1")
     int delete_level1_Comment(String commentId);//删除一级评论本身
 
-    @Update("update Comment set likes = likes + 1 where commentId = #{commentId}")
+    @Update("update comment set likes = likes + 1 where commentId = #{commentId}")
     void likeComment(String commentId);
 
-    @Select("select commentId,fatherId,userId,content,createTime,likes,level from Comment where fatherId = #{fatherId} and level = 1")
+    @Select("select commentId,fatherId,userId,userName,content,createTime,likes,level from comment where fatherId = #{fatherId} and level = 1")
     List<Comment> findFirstByArticleId(String fatherId);//找到fatherId是articleId的评论，即一级评论列表
 
-    @Select("select commentId,fatherId,userId,content,createTime,likes,level from Comment where fatherId = #{commentId} and level = 2")
+    @Select("select commentId,fatherId,userId,userName,content,createTime,likes,level from comment where fatherId = #{commentId} and level = 2")
     List<Comment> findSecondByCommentId(String commentId);//将一级评论的commentId当作fatherId传入，寻找它的二级评论列表
 }

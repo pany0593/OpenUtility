@@ -41,18 +41,49 @@ CREATE TABLE `water_electricity_bill` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
-/*Table structure for table `post` */
+/*Table structure for post */
 
-CREATE TABLE `post` (
-                        `id` varchar(30) NOT NULL,
+CREATE TABLE `water_electricity_article` (
+                        `articleId` varchar(30) NOT NULL,
                         `title` varchar(255) NOT NULL,
                         `content` text NOT NULL,
-                        `user_id` varchar(30) NOT NULL,
-                        `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-                        PRIMARY KEY (`id`),
-                        KEY `user_id` (`user_id`),
-                        CONSTRAINT `post_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
+                        `authorId` varchar(30) NOT NULL,
+                        `authorName` varchar(30) NOT NULL,
+                        `desc` varchar(30) NOT NULL,
+                        `createTime` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+                        PRIMARY KEY (`articleId`),
+                        CONSTRAINT `post_ibfk_1` FOREIGN KEY (`authorId`) REFERENCES `user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+CREATE TABLE `water_electricity_comment` (
+                        `commentId` varchar(30) NOT NULL,
+                        `fatherId` varchar(30) NOT NULL,
+                        `userId` varchar(30) NOT NULL,
+                        `userName` varchar(30) NOT NULL,
+                        `content` varchar(100) NOT NULL,
+                        `createTime` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+                        PRIMARY KEY (`commentId`),
+                        CONSTRAINT `post_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `user` (`id`),
+                        CONSTRAINT `post_ibfk_1` FOREIGN KEY (`userName`) REFERENCES `user` (`username`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+CREATE TABLE `water_electricity_favorite_article` (
+                        `id` varchar(30) NOT NULL,
+                        `articleId` varchar(30) NOT NULL,
+                        `userId` varchar(30) NOT NULL,
+                        PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+CREATE TABLE `water_electricity_favorite_comment` (
+                        `id` varchar(30) NOT NULL,
+                        `commentId` varchar(30) NOT NULL,
+                        `userId` varchar(30) NOT NULL,
+                        PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;

@@ -31,18 +31,18 @@ public interface UserMapper {
     /**
      * 根据用户ID查找用户
      *
-     * @param userId 用户ID
+     * @param id 用户ID
      * @return 用户对象
      */
-    @Select("SELECT * FROM user WHERE id = #{userId}")
-    User findUserById(@Param("userId") String userId);
+    @Select("SELECT * FROM user WHERE id = #{id}")
+    User findUserById(@Param("id") String id);
 
     /**
      * 更新用户头像
      *
-     * @param userId 用户ID
-     * @param avatarPath 头像路径
+     * @param id 用户ID
+     * @param avatar 头像路径
      */
-    @Update("UPDATE user SET avatar = #{avatarPath} WHERE id = #{userId}")
-    void updateUserAvatar(@Param("userId") String userId, @Param("avatarPath") String avatarPath);
+    @Update("UPDATE user SET avatar = #{avatar} WHERE id = #{id}")
+    void updateUserAvatar(@Param("id") String id, @Param("avatar") String avatar);
 }

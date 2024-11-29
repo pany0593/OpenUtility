@@ -24,6 +24,7 @@ public class PostController {
     //发帖(done)
     @PostMapping("/article_add")//done
     public Result article_add(@RequestBody Article article) {
+        System.out.println(article.getDesc());
         try {
             article.setArticleId(postService.createArticleId());
             if(postService.createArticle(article) != 0){
@@ -38,27 +39,36 @@ public class PostController {
 
     //删帖(done)
     @PostMapping("/article_delete")//done
-    public Result article_delete(Article article) {
-        if (postService.deleteArticle(article)) {
-            return Result.success();
-        } else {
-            return Result.error("Failed to delete article");
+    public Result article_delete(@RequestBody Article article) {
+
+        try {
+            if (postService.deleteArticle(article)) {
+                return Result.success();
+            } else {
+                return Result.error("Failed to delete article");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
     //更新帖子(done)
     @PostMapping("/article_update")//done
-    public Result article_update(Article article) {
-        if (postService.updateArticle(article)) {
-            return Result.success();
-        } else {
-            return Result.error("Failed to update article");
+    public Result article_update(@RequestBody Article article) {
+        try {
+            if (postService.updateArticle(article)) {
+                return Result.success();
+            } else {
+                return Result.error("Failed to update article");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
     //点赞文章(done)
     @PostMapping("/article_like")
-    public Result likeArticle(Article article0) {
+    public Result likeArticle(@RequestBody Article article0) {
         Article article = postService.findByArticleId(article0.getArticleId());
         if (article == null) {
             return Result.error("Failed to find article");
@@ -75,14 +85,14 @@ public class PostController {
 
     //发表评论(done)
     @PostMapping("/comment_add")//done
-    public Result comment_add(Comment comment) {
+    public Result comment_add(@RequestBody Comment comment) {
         String commentId = postService.addComment(comment);
         return Result.success(postService.findByCommentId(commentId));
     }
 
     //删除评论(done)
     @PostMapping("/comment_delete")
-    public Result comment_delete(Comment comment0) {
+    public Result comment_delete(@RequestBody Comment comment0) {
         Comment comment = postService.findByCommentId(comment0.getCommentId());
         if (comment.getLevel() == 2) {
             if (postService.delete_level2_Comment(comment0.getCommentId())) {
@@ -98,7 +108,7 @@ public class PostController {
 
     //点赞评论(done)
     @PostMapping("/comment_like")
-    private Result likeComment(Comment comment0){
+    private Result likeComment(@RequestBody Comment comment0){
         Comment comment=postService.findByCommentId(comment0.getCommentId());
         if(comment==null){
             return Result.error("fail to find comment");
@@ -116,18 +126,20 @@ public class PostController {
 
     //查看文章(done)
     @GetMapping("/article_get")
-    public Result getArticle(Article article0) {
-        Article article = postService.findByArticleId(article0.getArticleId());
-        if (article == null) {
+    public Result getArticle(@RequestBody Article article0) {
+        Article article = null;
+        try {
+            article = postService.findByArticleId(article0.getArticleId());
+            postService.addClicks(article.getArticleId());
+        } catch (Exception e) {
             return Result.error("fail to find article");
         }
-        postService.addClicks(article.getArticleId());
         return Result.success(article);//直接返回文章内容,不需要Response?
     }
 
     //查看评论(done)
     @GetMapping("/comment_get")
-    private Result getComment(Article article){
+    private Result getComment(@RequestBody Article article){
         List<Comment> comments = postService.getCommentByArticleId(article.getArticleId());
         return Result.success(comments);
     }

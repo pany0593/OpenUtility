@@ -17,8 +17,8 @@ public interface ArticleMapper {//Article表
     @Update("UPDATE article SET title = #{title}, `desc` = #{desc}, content = #{content} WHERE articleId = #{articleId}")
     int updateArticle(Article article);//修改文章
 
-    @Select("SELECT articleId,title,authorId,authorName,`desc`,createTime,likes,clicks from article where articleId = #{articleId}")
-    Article findByArticleId(String articleId);//根据文章id返回文章搜索结果
+    @Select("SELECT articleId,title,authorId,authorName,`desc`,content,createTime,likes,clicks from article where articleId = #{articleId}")
+    Article findByArticleId(@Param("articleId") String articleId);//根据文章id返回文章搜索结果
 
     @Update("UPDATE article set likes = likes + 1 where articleId = #{articleId}")
     void likeArticle(String articleId);//点赞文章

@@ -36,6 +36,7 @@ public class BillController {
 
     @PostMapping("/update")
     public Result update(@RequestBody Bill bill) {
+
         try {
             billService.updateBill(bill);
             return Result.success();

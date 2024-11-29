@@ -20,6 +20,7 @@ public interface BillMapper {
 
     @Delete("DELETE FROM water_electricity_bill WHERE id = #{id}")
     int deleteBill(String id);
+
     @Update("UPDATE water_electricity_bill SET year = #{bill.year}, month = #{bill.month}, days = #{bill.days}, building = #{bill.building}, dormitory = #{bill.dormitory}, " +
             "electricity_usage = #{bill.electricity_usage}, electricity_cost = #{bill.electricity_cost}, water_usage = #{bill.water_usage}, water_cost = #{bill.water_cost}, total_cost = #{bill.total_cost} WHERE id = #{bill.id}")
     int updateBill(@Param("bill") Bill bill);

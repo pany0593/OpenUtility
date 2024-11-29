@@ -35,8 +35,7 @@ public class BillService {
     public void updateBill(Bill bill) {
 
         try {
-            if(billMapper.findBillById(bill.getId()) == null)
-            {
+            if(billMapper.findBillById(bill.getId()) == null) {
                 throw new Exception("没有这条记录");
             }
         } catch (Exception e) {

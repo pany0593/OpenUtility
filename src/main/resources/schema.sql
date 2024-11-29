@@ -51,8 +51,8 @@ CREATE TABLE `article` (
                         `authorName` varchar(30) NOT NULL,
                         `desc` varchar(30) NOT NULL,
                         `createTime` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-                        `likes` int NOT NULL ,
-                        `clicks` int NOT NULL ,
+                        `likes` int DEFAULT 0,
+                        `clicks` int DEFAULT 0,
                         PRIMARY KEY (`articleId`),
                         FOREIGN KEY (`authorId`) REFERENCES `user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -65,7 +65,7 @@ CREATE TABLE `comment` (
                         `userName` varchar(30) NOT NULL,
                         `content` varchar(100) NOT NULL,
                         `createTime` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-                        `likes` int NOT NULL ,
+                        `likes` int DEFAULT 0,
                         PRIMARY KEY (`commentId`),
                         FOREIGN KEY (`userId`) REFERENCES `user` (`id`),
                         FOREIGN KEY (`userName`) REFERENCES `user` (`username`)

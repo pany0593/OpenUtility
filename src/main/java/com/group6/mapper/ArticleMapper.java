@@ -9,7 +9,7 @@ import java.util.List;
 public interface ArticleMapper {//Article表
     @Insert("INSERT INTO article (articleId, authorId, authorName, title, `desc`, content) " +
             "VALUES (#{article.articleId}, #{article.authorId}, #{article.authorName}, #{article.title}, #{article.desc}, #{article.content})")
-    int insertArticle(Article article);//增加文章
+    int insertArticle(@Param("article") Article article);//增加文章
 
     @Delete("DELETE FROM article WHERE articleId = #{articleId}")
     int deleteArticle(Article article);//删除文章

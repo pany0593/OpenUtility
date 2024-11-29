@@ -23,7 +23,7 @@ public class PostController {
 
     //发帖(done)
     @PostMapping("/article_add")//done
-    public Result article_add(Article article) {
+    public Result article_add(@RequestBody Article article) {
         try {
             article.setArticleId(postService.createArticleId());
             if(postService.createArticle(article) != 0){

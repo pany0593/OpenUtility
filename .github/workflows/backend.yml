@@ -38,11 +38,11 @@ jobs:
         scp -i ecs_key.pem target/*.jar $ECS_USER@$ECS_HOST:$APP_PATH/app.jar
         # 登录到 ECS 并运行应用
         ssh -i ecs_key.pem -tt $ECS_USER@$ECS_HOST << 'EOF'
-        # 切换到存放 app.jar 的路径
+        
         cd $APP_PATH
-        # 停止现有的 Java 应用，如果存在的话
-        pkill -f 'java -jar' || true  # 停止所有正在运行的 Java 应用（如果有）
-        # 运行新的 app.jar
+        
+        pkill -f 'java -jar' || true  
+        
         nohup java -jar app.jar > app.log 2>&1 &
         exit
         EOF

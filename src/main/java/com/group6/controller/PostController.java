@@ -130,7 +130,7 @@ public class PostController {
         Article article = null;
         try {
             article = postService.findByArticleId(article0.getArticleId());
-//      postService.addClicks(article.getArticleId());
+            postService.addClicks(article.getArticleId());
         } catch (Exception e) {
             return Result.error("fail to find article");
         }

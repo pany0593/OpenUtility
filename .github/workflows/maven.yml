@@ -39,13 +39,16 @@ jobs:
         # 上传构建产物到 ECS
         scp -i ecs_key.pem target/*.jar $ECS_USER@$ECS_HOST:$APP_PATH/app.jar
 
+
         # 登录到 ECS 并运行应用
         ssh -i ecs_key.pem $ECS_USER@$ECS_HOST << 'EOF'
-        docker stop app || true
-        docker rm app || true
+        # 切换到存放 app.jar 的路径
+        cd $APP_PATH
 
-        # 运行新的容器
-        docker run -p 8080:8080 --name app --network app_network -v /home/openutility:/app -v /home/openutility/logs:/app/logs -d openjdk:17 sh -c "java -jar /app/app.jar"
+        # 停止现有的 Java 应用，如果存在的话
+        pkill -f 'java -jar' || true  # 停止所有正在运行的 Java 应用（如果有）
 
+        # 运行新的 app.jar
+        nohup java -jar app.jar > app.log 2>&1 &
         exit
         EOF

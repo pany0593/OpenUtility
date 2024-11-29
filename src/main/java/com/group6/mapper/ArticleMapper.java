@@ -18,7 +18,7 @@ public interface ArticleMapper {//Article表
     int updateArticle(Article article);//修改文章
 
     @Select("SELECT articleId,title,authorId,authorName,`desc`,content,createTime,likes,clicks from article where articleId = #{articleId}")
-    Article findByArticleId(@Param("articleId") String articleId);//根据文章id返回文章搜索结果
+    Article findByArticleId(@Param("articleId") String articleId);//根据文章id返回文章搜索结果//已修改
 
     @Update("UPDATE article set likes = likes + 1 where articleId = #{articleId}")
     void likeArticle(String articleId);//点赞文章

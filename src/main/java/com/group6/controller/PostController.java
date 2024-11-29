@@ -124,7 +124,7 @@ public class PostController {
     }
 
 
-    //查看文章(done)
+    //查看文章(done)//已修改
     @GetMapping("/article_get")
     public Result getArticle(@RequestBody Article article0) {
         Article article = null;

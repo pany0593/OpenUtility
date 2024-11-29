@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -26,9 +27,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors() // 启用跨域配置
-                .and()
-                .csrf().disable() // 如果不需要 CSRF 保护，可以禁用
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // 设置跨域配置
+                .csrf(AbstractHttpConfigurer::disable) // 禁用 CSRF 保护
                 .authorizeHttpRequests(authorize -> authorize
                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 允许预检请求
 //                        .requestMatchers("/bill/add").permitAll() // 开放 /bill/add 路由

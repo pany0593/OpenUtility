@@ -69,18 +69,22 @@ CREATE TABLE `water_electricity_comment` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
-CREATE TABLE `water_electricity_favorite_article` (
+CREATE TABLE `favorite_article` (
                         `id` varchar(30) NOT NULL,
                         `articleId` varchar(30) NOT NULL,
                         `userId` varchar(30) NOT NULL,
+                        CONSTRAINT `post_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `user` (`id`),
+                        CONSTRAINT `post_ibfk_1` FOREIGN KEY (`articleId`) REFERENCES `water_electricity_article` (`articleId`),
                         PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
-CREATE TABLE `water_electricity_favorite_comment` (
+CREATE TABLE `favorite_comment` (
                         `id` varchar(30) NOT NULL,
                         `commentId` varchar(30) NOT NULL,
                         `userId` varchar(30) NOT NULL,
+                        CONSTRAINT `post_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `user` (`id`),
+                        CONSTRAINT `post_ibfk_1` FOREIGN KEY (`commentId`) REFERENCES `water_electricity_comment` (`commentId`),
                         PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 

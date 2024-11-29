@@ -1,16 +1,10 @@
-# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
-
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
 name: Java CI with Maven
 
 on:
   push:
-    branches: [ "CIDI" ]
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   build:
@@ -28,6 +22,28 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file pom.xml
 
-    # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
-    #- name: Update dependency graph
-    # uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
+    # 部署到 ECS
+    - name: Deploy to ECS
+      env:
+        ECS_HOST: ${{ secrets.ECS_HOST }}         # ECS 的公网 IP
+        ECS_USER: ${{ secrets.ECS_USER }}         # SSH 用户名
+        ECS_KEY: ${{ secrets.ECS_KEY }}           # SSH 私钥
+        APP_PATH: "/home/openutility"                   # ECS 上的目标路径
+      run: |
+        # 添加私钥到 SSH 配置
+        echo "${ECS_KEY}" > ecs_key.pem
+        chmod 600 ecs_key.pem
+
+        # 使用 ssh-keyscan 信任 ECS 主机
+        mkdir -p ~/.ssh
+        ssh-keyscan -H $ECS_HOST >> ~/.ssh/known_hosts
+
+        # 上传构建产物到 ECS
+        scp -i ecs_key.pem target/*.jar $ECS_USER@$ECS_HOST:$APP_PATH/app.jar
+
+        # 登录到 ECS 并运行应用
+        ssh -i ecs_key.pem $ECS_USER@$ECS_HOST << 'EOF'
+        pkill -f 'java -jar' || true            # 停止已有应用（可选）
+        nohup java -jar $APP_PATH/app.jar > $APP_PATH/app.log 2>&1 &
+        exit
+        EOF

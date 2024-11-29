@@ -25,8 +25,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-//                .cors() // 启用跨域配置
-//                .and()
+                .cors() // 启用跨域配置
+                .and()
                 .csrf().disable() // 如果不需要 CSRF 保护，可以禁用
                 .authorizeHttpRequests(authorize -> authorize
 //                        .requestMatchers("/bill/add").permitAll() // 开放 /bill/add 路由

@@ -51,7 +51,7 @@ public class BillController {
         try {
             Bill bill = billService.getBill(bbill);
             return Result.success(bill);
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             return Result.error(e.getMessage());
         }
     }

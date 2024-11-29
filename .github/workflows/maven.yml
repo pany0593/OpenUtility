@@ -41,7 +41,7 @@ jobs:
 
 
         # 登录到 ECS 并运行应用
-        ssh -i ecs_key.pem -t $ECS_USER@$ECS_HOST << 'EOF'
+        ssh -i ecs_key.pem -t $ECS_USER@$ECS_HOST << remotessh
         # 切换到存放 app.jar 的路径
         cd $APP_PATH
 

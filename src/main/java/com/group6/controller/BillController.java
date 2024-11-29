@@ -25,9 +25,9 @@ public class BillController {
         }
     }
     @PostMapping("/delete")
-    public Result delete(@RequestBody String id) {
+    public Result delete(@RequestBody Bill bill) {
         try {
-            billService.deleteBill(id);
+            billService.deleteBill(bill);
             return Result.success();
         } catch (Exception e) {
             return Result.error(e.getMessage());
@@ -50,7 +50,7 @@ public class BillController {
     public Result<Bill> getData(@RequestBody Bill bbill) {
         try {
             Bill bill = billService.getBill(bbill);
-            return Result.success();
+            return Result.success(bill);
         } catch (IllegalArgumentException e) {
             return Result.error(e.getMessage());
         }

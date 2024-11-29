@@ -51,8 +51,10 @@ CREATE TABLE `article` (
                         `authorName` varchar(30) NOT NULL,
                         `desc` varchar(30) NOT NULL,
                         `createTime` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+                        `likes` int NOT NULL ,
+                        `clicks` int NOT NULL ,
                         PRIMARY KEY (`articleId`),
-                        CONSTRAINT `post_ibfk_1` FOREIGN KEY (`authorId`) REFERENCES `user` (`id`)
+                        FOREIGN KEY (`authorId`) REFERENCES `user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
@@ -63,9 +65,10 @@ CREATE TABLE `comment` (
                         `userName` varchar(30) NOT NULL,
                         `content` varchar(100) NOT NULL,
                         `createTime` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+                        `likes` int NOT NULL ,
                         PRIMARY KEY (`commentId`),
-                        CONSTRAINT `post_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `user` (`id`),
-                        CONSTRAINT `post_ibfk_1` FOREIGN KEY (`userName`) REFERENCES `user` (`username`)
+                        FOREIGN KEY (`userId`) REFERENCES `user` (`id`),
+                        FOREIGN KEY (`userName`) REFERENCES `user` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
@@ -73,8 +76,8 @@ CREATE TABLE `favorite_article` (
                         `id` varchar(30) NOT NULL,
                         `articleId` varchar(30) NOT NULL,
                         `userId` varchar(30) NOT NULL,
-                        CONSTRAINT `post_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `user` (`id`),
-                        CONSTRAINT `post_ibfk_1` FOREIGN KEY (`articleId`) REFERENCES `article` (`articleId`),
+                        FOREIGN KEY (`userId`) REFERENCES `user` (`id`),
+                        FOREIGN KEY (`articleId`) REFERENCES `article` (`articleId`),
                         PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -83,8 +86,8 @@ CREATE TABLE `favorite_comment` (
                         `id` varchar(30) NOT NULL,
                         `commentId` varchar(30) NOT NULL,
                         `userId` varchar(30) NOT NULL,
-                        CONSTRAINT `post_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `user` (`id`),
-                        CONSTRAINT `post_ibfk_1` FOREIGN KEY (`commentId`) REFERENCES `comment` (`commentId`),
+                        FOREIGN KEY (`userId`) REFERENCES `user` (`id`),
+                        FOREIGN KEY (`commentId`) REFERENCES `comment` (`commentId`),
                         PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 

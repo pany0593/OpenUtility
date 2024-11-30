@@ -27,7 +27,11 @@ jobs:
         ECS_USER: ${{ secrets.ECS_USER }}         # SSH 用户名
         ECS_KEY: ${{ secrets.ECS_KEY }}           # SSH 私钥
         APP_PATH: "/home/openutility"             # ECS 上的目标路径
+        COMMIT_SHA: ${{ github.sha }}             # 当前提交的 SHA
       run: |
+        # 提取短 SHA 作为文件名的一部分
+        SHORT_COMMIT=${COMMIT_SHA::7}
+
         # 添加私钥到 SSH 配置
         echo "${ECS_KEY}" > ecs_key.pem
         chmod 600 ecs_key.pem
@@ -35,12 +39,16 @@ jobs:
         mkdir -p ~/.ssh
         ssh-keyscan -H $ECS_HOST >> ~/.ssh/known_hosts
         # 上传构建产物到 ECS
-        scp -i ecs_key.pem target/*.jar $ECS_USER@$ECS_HOST:$APP_PATH/app.jar
+        scp -i ecs_key.pem target/*.jar $ECS_USER@$ECS_HOST:$APP_PATH/app_${SHORT_COMMIT}.jar
         # 登录到 ECS 并运行应用
-        ssh -i ecs_key.pem -tt $ECS_USER@$ECS_HOST << 'EOF'
-        
-        cd /home/openutility
-        pkill -f 'java -jar app.jar' || true  
-        nohup java -jar app.jar > app.log 2>&1 &
+        ssh -i ecs_key.pem -tt $ECS_USER@$ECS_HOST << EOF
+        cd $APP_PATH
+        # 停止旧的应用实例
+        OLD_PID=\$(ps -ef | grep 'java -jar app_' | grep -v grep | awk '{print \$2}')
+        if [ -n "\$OLD_PID" ]; then
+          kill -9 \$OLD_PID
+        fi
+        # 启动新的应用实例
+        nohup java -jar app_${SHORT_COMMIT}.jar > app_${SHORT_COMMIT}.log 2>&1 &
         exit
-        EOF
+EOF

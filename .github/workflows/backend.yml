@@ -51,4 +51,4 @@ jobs:
         # 启动新的应用实例
         nohup java -jar app_${SHORT_COMMIT}.jar > app_${SHORT_COMMIT}.log 2>&1 &
         exit
-EOF
+        EOF

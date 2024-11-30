@@ -44,10 +44,7 @@ jobs:
         ssh -i ecs_key.pem -tt $ECS_USER@$ECS_HOST << EOF
         cd $APP_PATH
         # 停止旧的应用实例
-        OLD_PID=\$(ps -ef | grep 'java -jar app_' | grep -v grep | awk '{print \$2}')
-        if [ -n "\$OLD_PID" ]; then
-          kill -9 \$OLD_PID
-        fi
+        pkill -f 'java -jar app_' || true  
         # 启动新的应用实例
         nohup java -jar app_${SHORT_COMMIT}.jar > app_${SHORT_COMMIT}.log 2>&1 &
         exit

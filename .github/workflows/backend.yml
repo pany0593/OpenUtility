@@ -27,11 +27,7 @@ jobs:
         ECS_USER: ${{ secrets.ECS_USER }}         # SSH 用户名
         ECS_KEY: ${{ secrets.ECS_KEY }}           # SSH 私钥
         APP_PATH: "/home/openutility"             # ECS 上的目标路径
-        COMMIT_SHA: ${{ github.sha }}             # 当前提交的 SHA
       run: |
-        # 提取短 SHA 作为文件名的一部分
-        SHORT_COMMIT=${COMMIT_SHA::7}
-
         # 添加私钥到 SSH 配置
         echo "${ECS_KEY}" > ecs_key.pem
         chmod 600 ecs_key.pem
@@ -39,13 +35,16 @@ jobs:
         mkdir -p ~/.ssh
         ssh-keyscan -H $ECS_HOST >> ~/.ssh/known_hosts
         # 上传构建产物到 ECS
-        scp -i ecs_key.pem target/*.jar $ECS_USER@$ECS_HOST:$APP_PATH/app_${SHORT_COMMIT}.jar
-        # 登录到 ECS 并运行应用
+        scp -i ecs_key.pem target/*.jar $ECS_USER@$ECS_HOST:$APP_PATH/app.jar
+        # 登录到 ECS 并更新 Docker 容器
         ssh -i ecs_key.pem -tt $ECS_USER@$ECS_HOST << EOF
         cd $APP_PATH
-        # 停止旧的应用实例
-        pkill -f 'java -jar app_' || true  
-        # 启动新的应用实例
-        nohup java -jar app_${SHORT_COMMIT}.jar > app_${SHORT_COMMIT}.log 2>&1 &
+        # 删除旧的 Docker 容器
+        docker rm -f app || true
+        # 运行新的 Docker 容器
+        docker run -p 8080:8080 --restart=always --name app \
+          -v /home/openutility:/app \
+          -v /home/openutility/logs:/app/logs \
+          -d openjdk:17 sh -c "java -jar /app/app.jar > /app/logs/app.log 2>&1"
         exit
         EOF

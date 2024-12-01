@@ -1,19 +1,20 @@
 package com.group6.service;
 
-import com.group6.pojo.Article;
-import com.group6.pojo.Comment;
+import com.group6.pojo.*;
 import com.group6.mapper.ArticleMapper;
 import com.group6.mapper.CommentMapper;
 import com.group6.util.ThreadLocalUtil;
 import com.group6.mapper.FavoriteMapper;
-import com.group6.pojo.Favorite;
 import com.group6.util.SnowFlakeUtils;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.View;
 
 @Component
 public class PostService {
@@ -30,6 +31,8 @@ public class PostService {
     private SnowFlakeUtils snowFlakeUtils;
     @Autowired
     private UserService userService;
+    @Autowired
+    private View error;
 
     //生成文章id
     public String createArticleId() {
@@ -60,14 +63,25 @@ public class PostService {
 
     //发表评论
     public String addComment(Comment comment) {
-        String userId = (String) threadLocalUtil.get("userId");
         String commentId="CM"+snowFlakeUtils.nextId();
         comment.setCommentId(commentId);
-        String cp = "CM";
-        if (findByCommentId(commentId).getFatherId().regionMatches(0, cp, 0, 2)){//比较fatherId是否是articleId来确认是一级还是二级评论
-            commentMapper.add_level2_Comment(comment);
-        } else {
-            commentMapper.add_level1_Comment(comment);
+        String CM = "CM";
+        String AR = "AR";
+
+        //比较fatherId是否是articleId来确认是一级还是二级评论
+        if (comment.getFatherId() == null) {
+            throw new IllegalArgumentException("FatherId is null");
+        }
+        try{
+            if ((comment.getFatherId()).startsWith(CM)) {
+//                System.out.println("get in 2");
+                commentMapper.add_level2_Comment(comment);
+            }else if ((comment.getFatherId()).startsWith(AR)){
+//                System.out.println("get in 1");
+                commentMapper.add_level1_Comment(comment);
+            }
+        } catch (Exception e) {
+            throw new IllegalArgumentException("fail to compare");
         }
         return commentId;
     }
@@ -84,27 +98,47 @@ public class PostService {
 
     //删除一级评论以及其二级评论
     public boolean delete_level1_Comment(String commentId) {
-        if (commentMapper.delete_son_Comment(commentId) > 0) {
+        //查看是否有子评论
+        //遍历评论列表找已该评论为父评论的评论列表
+        //若为空，则没有子评论，直接删除
+        //若非空，则先删除子评论再删除自身
+        List<Comment> soncomments = findByfatherId(commentId);
+        if (soncomments == null || soncomments.isEmpty()) {
+            return commentMapper.delete_level1_Comment(commentId) > 0;
+        } else if (commentMapper.delete_son_Comment(commentId) > 0){
             return commentMapper.delete_level1_Comment(commentId) > 0;
         }
         return false;
     }
 
+    //搜索特定fatherId的评论列表
+    public List<Comment> findByfatherId(String fatherId) {
+        List<Comment> soncomments = commentMapper.findByfatherId(fatherId);
+        return soncomments;
+    }
+
+    //搜索所有评论
+    public List<Comment> findAllByCommentId() {
+        List<Comment> allcomments = commentMapper.findAllComment();
+        return allcomments;
+    }
+
     //查看文章评论
     public List<Comment> getCommentByArticleId(String articleId) {
         List<Comment> comments = commentMapper.findFirstByArticleId(articleId);//生成一级评论列表
-        for (Comment comment:comments) {//循环生成每个二级评论列表
-            comment.setSubComments(commentMapper.findSecondByCommentId(comment.getCommentId()));
+        for (Comment tmpcomment:comments) {//循环生成每个二级评论列表
+            tmpcomment.setSubComments(commentMapper.findSecondByCommentId(tmpcomment.getCommentId()));
+            tmpcomment.subComments.sort(Comparator.comparing(Comment::getLikes).reversed());
         }
         return comments;
     }
 
-    public List<Article> getList(Integer page, Integer sort,Integer pagesPerPage) {
+    public List<Article> getList(ArticleList articlelist, Integer pagesPerPage) {
         List<Article> articles;
-        if(sort==1){
-            articles=articleMapper.getListByTime((page - 1) * pagesPerPage, pagesPerPage);
+        if(articlelist.getSort() == 1){//sort = 1是根据文章发表时间倒序排列，其他值是根据点击量倒序排序。
+            articles=articleMapper.getListByTime((articlelist.getPage() - 1) * pagesPerPage, pagesPerPage);
         }else{
-            articles=articleMapper.getListByClick((page - 1) * pagesPerPage, pagesPerPage);
+            articles=articleMapper.getListByClick((articlelist.getPage() - 1) * pagesPerPage, pagesPerPage);
         }
         return articles;
     }
@@ -123,7 +157,7 @@ public class PostService {
     }
 
     public List<Article> getLikesByUserId() {
-        String userId = String.valueOf(threadLocalUtil.get("userId"));
+        String userId = String.valueOf(threadLocalUtil.get("userId"));//从token获取用户id？怎么从这里获取用户id？
         List<Favorite> favorites = favoriteMapper.getFavoriteArticleByUserId(userId);
         List<Article> articles = new ArrayList<>();
         for (Favorite favorite : favorites) {

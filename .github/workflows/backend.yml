@@ -45,6 +45,6 @@ jobs:
         docker run -p 8080:8080 --restart=always --name app \
           -v /home/openutility:/app \
           -v /home/openutility/logs:/app/logs \
-          -d openjdk:17 sh -c "java -jar /app/app.jar > /app/logs/app.log 2>&1"
+          -d openjdk:17 sh -c "java -jar /app/app.jar"
         exit
         EOF

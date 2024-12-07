@@ -27,6 +27,7 @@ jobs:
         ECS_USER: ${{ secrets.ECS_USER }}         # SSH 用户名
         ECS_KEY: ${{ secrets.ECS_KEY }}           # SSH 私钥
         APP_PATH: "/home/openutility"             # ECS 上的目标路径
+        DATABASE_PASSWORD: ${{ secrets.database_password }}  # 数据库密码
       run: |
         # 添加私钥到 SSH 配置
         echo "${ECS_KEY}" > ecs_key.pem
@@ -41,10 +42,11 @@ jobs:
         cd $APP_PATH
         # 删除旧的 Docker 容器
         docker rm -f app || true
-        # 运行新的 Docker 容器
+        # 运行新的 Docker 容器并传递数据库密码
         docker run -p 8080:8080 --restart=always --name app \
           -v /home/openutility:/app \
           -v /home/openutility/logs:/app/logs \
+          -e SPRING_DATASOURCE_PASSWORD=$DATABASE_PASSWORD \
           -d openjdk:17 sh -c "java -jar /app/app.jar"
         exit
         EOF

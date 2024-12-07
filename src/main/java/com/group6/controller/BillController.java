@@ -6,6 +6,7 @@ import com.group6.service.BillService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
+import java.util.List;
 
 
 @RestController
@@ -51,6 +52,16 @@ public class BillController {
         try {
             Bill bill = billService.getBill(bbill);
             return Result.success(bill);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    @GetMapping("/getAllData")
+    public Result<List<Bill>> getAllData() {
+        try {
+            List<Bill> bills = billService.getAllBill();
+            return Result.success(bills);
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }

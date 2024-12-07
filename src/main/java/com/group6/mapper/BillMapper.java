@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.annotations.Param;
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Mapper
@@ -27,6 +28,9 @@ public interface BillMapper {
 
     @Select("SELECT * FROM water_electricity_bill WHERE id = #{bill.id}")
     Bill selectBillById(@Param("bill") Bill bill);
+
+    @Select("SELECT * FROM water_electricity_bill")
+    List<Bill> selectAllBill();
 
     @Select("SELECT SUM(electricity_cost + water_cost) FROM bill WHERE dormitory = #{dormitory} AND " +
             "(year * 12 + month) BETWEEN (#{startYear} * 12 + #{startMonth}) AND (#{endYear} * 12 + #{endMonth})")

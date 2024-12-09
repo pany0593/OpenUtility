@@ -22,12 +22,12 @@ public class PostController {
     @Autowired
     private PostService postService;
 
-    private Integer pagesPerPage =4;//先设置为4篇文章每页
+    private Integer pagesPerPage =4;//设置文章列表为每页4篇文章
 
     //发帖(done)
     @PostMapping("/article_add")//done
     public Result article_add(@RequestBody Article article) {
-        System.out.println(article.getDesc());
+//        System.out.println(article.getDesc());
         try {
             article.setArticleId(postService.createArticleId());
             if(postService.createArticle(article) != 0){
@@ -41,7 +41,7 @@ public class PostController {
     }
 
     //删帖(done)
-    @PostMapping("/article_delete")//done
+    @DeleteMapping("/article_delete")//done
     public Result article_delete(@RequestBody Article article) {
 
         try {
@@ -68,16 +68,20 @@ public class PostController {
     }
 
     //点赞文章(done)//如何获取进行点赞操作的用户id？
+    //在文章查看界面点赞
     @PostMapping("/article_like")
     public Result likeArticle(@RequestBody Article article0) {
-        Article article = postService.findByArticleId(article0.getArticleId());
-        if (article == null) {
-            return Result.error("Failed to find article");
+        if (article0.getArticleId() == null || article0.getArticleId().isEmpty()) {
+            return Result.error("Failed to find article : empty articleId");
         }
-        List<Article> likesArticle = postService.getLikesByUserId();
+        Article article = postService.findByArticleId(article0.getArticleId());
+        if (article == null) {//根据文章id获取文章对象失败
+            return Result.error("Failed to find article : articleId do not exist");
+        }
+        List<Article> likesArticle = postService.getLikesByUserId();//获取该用户的点赞列表
         for (Article tmpArticle : likesArticle) {
             if (tmpArticle.getArticleId().equals(article0.getArticleId())) {
-                return Result.error("already liked");
+                return Result.error("Fail to like article : already liked");
             }
         }
         postService.likeArticle(article0.getArticleId());
@@ -96,7 +100,7 @@ public class PostController {
     }
 
     //删除评论(done)
-    @PostMapping("/comment_delete")
+    @DeleteMapping("/comment_delete")
     public Result comment_delete(@RequestBody Comment comment) {
         if (comment.getCommentId() == null) return Result.error("commentId is null");
 
@@ -148,7 +152,7 @@ public class PostController {
 
 
     //查看文章(done)//已修改
-    @GetMapping("/article_get")
+    @PostMapping("/article_get")
     public Result getArticle(@RequestBody Article article0) {
         Article article = null;
         try {
@@ -157,11 +161,11 @@ public class PostController {
         } catch (Exception e) {
             return Result.error("fail to find article");
         }
-        return Result.success(article);//直接返回文章内容,不需要Response?
+        return Result.success(article);
     }
 
     //查看评论(done)
-    @GetMapping("/comment_get")
+    @PostMapping("/comment_get")
     private Result getComment(@RequestBody Article article){
         //点击评论区展开一级评论列表，此时生成所有一级评论的二级评论列表
         //评论列表由点赞数降序排序
@@ -177,7 +181,7 @@ public class PostController {
     }
 
     //查看文章列表(done)
-    @GetMapping("/article_list_get")
+    @PostMapping("/article_list_get")
     public Result getList(@RequestBody ArticleList articlelist) {
         try {
             //获取文章数量

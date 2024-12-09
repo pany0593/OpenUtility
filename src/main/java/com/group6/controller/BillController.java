@@ -47,7 +47,7 @@ public class BillController {
 
     }
 
-    @GetMapping("/getData")
+    @PostMapping("/getData")
     public Result<Bill> getData(@RequestBody Bill bbill) {
         try {
             Bill bill = billService.getBill(bbill);
@@ -57,6 +57,15 @@ public class BillController {
         }
     }
 
+    @GetMapping("/getDataByDormitory")
+    public Result<Bill> getDataByDormitory(@RequestBody Bill bbill) {
+        try {
+            Bill bill = billService.getBillByDormitory(bbill);
+            return Result.success(bill);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
     @GetMapping("/getAllData")
     public Result<List<Bill>> getAllData() {
         try {

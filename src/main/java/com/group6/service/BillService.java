@@ -66,6 +66,16 @@ public class BillService {
         return billMapper.selectBillById(bill);
     }
 
+    public Bill getBillByDormitory(Bill bill) {
+        try {
+            if(billMapper.findBillByDormitory(bill) == null) {
+                throw new Exception("没有这条记录");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return billMapper.findBillByDormitory(bill);
+    }
     public List<Bill> getAllBill() {
         return billMapper.selectAllBill();
     }

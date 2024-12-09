@@ -16,7 +16,7 @@ public interface CommentMapper {//Comment表
     void add_level2_Comment(@Param("comment") Comment comment);
 
     @Select("select commentId,fatherId,userId,userName,content,createTime,likes,level from comment where commentId = #{commentId} ")
-    Comment findByCommentId(String commentId);
+    Comment findByCommentId(@Param("commentId")String commentId);
 
     @Delete("DELETE FROM comment WHERE commentId = #{commentId} and level = 2")
     int delete_level2_Comment(@Param("commentId")String commentId);//删除二级评论本身
@@ -28,7 +28,7 @@ public interface CommentMapper {//Comment表
     int delete_level1_Comment(@Param("commentId")String commentId);//删除一级评论本身
 
     @Update("update comment set likes = likes + 1 where commentId = #{commentId}")
-    void likeComment(String commentId);
+    void likeComment(@Param("commentId")String commentId);
 
     @Select("select commentId,userId,fatherId,userName,content,createTime,likes,level from comment where fatherId = #{articleId} and level = 1")
     List<Comment> findFirstByArticleId(@Param("articleId")String articleId);//找到fatherId是articleId的评论，即一级评论列表
@@ -40,5 +40,5 @@ public interface CommentMapper {//Comment表
     List<Comment> findAllComment();
 
     @Select("select commentId from comment where fatherId = #{fatherId}")
-    List<Comment> findByfatherId(String fatherId);
+    List<Comment> findByfatherId(@Param("fatherId")String fatherId);
 }

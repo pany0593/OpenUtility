@@ -29,6 +29,7 @@ jobs:
         APP_PATH: "/home/openutility"             # ECS 上的目标路径
         DATABASE_PASSWORD: ${{ secrets.database_password }}  # 数据库密码
       run: |
+        echo "${DATABASE_PASSWORD}"
         # 添加私钥到 SSH 配置
         echo "${ECS_KEY}" > ecs_key.pem
         chmod 600 ecs_key.pem

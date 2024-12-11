@@ -20,7 +20,7 @@ CREATE TABLE `user` (
     `password` VARCHAR(500) NOT NULL,
     `email` VARCHAR(100),
     `avatar` VARCHAR(1024),
-    `role` VARCHAR(20) NOT NULL DEFAULT 'ADMIN',
+    `user_role` VARCHAR(20) NOT NULL DEFAULT 'ADMIN',
     `building` INT NULL DEFAULT 0, -- 楼号
     `dormitory` INT NULL DEFAULT 0, -- 宿舍号
     PRIMARY KEY (`id`)

@@ -2,14 +2,17 @@ package com.group6.service;
 
 import com.group6.mapper.UserMapper;
 import com.group6.pojo.User;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-import javax.crypto.SecretKey;
-import java.util.Date;
+import com.group6.util.JwtUtils;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.UUID;
@@ -24,31 +27,16 @@ public class UserService {
     // 注入 BCryptPasswordEncoder 实例
     @Autowired
     private PasswordEncoder passwordEncoder;
-    //生成JWT密钥
-    private static final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+//    //生成JWT密钥
+//    private static final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
     /**
-     *  注册用户
+     * 注册用户
      *
      * @param user
+     * @return
      */
-//    public void registerUser(User user) {
-//        if (userExists(user.getUsername())) {
-//            throw new IllegalArgumentException("User already exists");
-//        }
-//        // 使用 UUID 生成 String 类型的用户 ID
-//        UUID uuid = UUID.randomUUID();
-//        String uniqueId = uuid.toString();
-//        user.setId(uniqueId);
-//        //加密密码
-//        user.setPassword(passwordEncoder.encode(user.getPassword()));
-//        //添加默认头像
-//        if (user.getAvatarPath() == null || user.getAvatarPath().isEmpty()) {
-//            user.setAvatarPath(generateDefaultAvatar());
-//        }
-//        saveUserToDatabase(user);
-//    }
-    public void registerUser(User user) {
+    public String registerUser(User user) {
         // 校验 user 对象及必要字段
         if (user == null) {
             throw new IllegalArgumentException("User object cannot be null");
@@ -58,6 +46,9 @@ public class UserService {
         }
         if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
             throw new IllegalArgumentException("Password cannot be null or empty");
+        }
+        if (user.getBuilding() == null || user.getDormitory() == null) {
+            throw new IllegalArgumentException("Building and dormitory cannot be null");
         }
 
         if (userExists(user.getUsername())) {
@@ -73,7 +64,11 @@ public class UserService {
         if (user.getAvatar() == null || user.getAvatar().isEmpty()) {
             user.setAvatar(generateDefaultAvatar());
         }
+        if (user.getRole() == null || user.getRole().isEmpty()) {
+            user.setRole("USER");
+        }
 
+        // 保存用户到数据库
         try {
             saveUserToDatabase(user);
         } catch (PersistenceException e) {
@@ -81,38 +76,67 @@ public class UserService {
             if (cause instanceof java.sql.SQLIntegrityConstraintViolationException) {
                 throw new IllegalArgumentException("User already exists or data integrity violation");
             }
-            if (cause != null) {
-                throw new IllegalArgumentException("Persistence error: " + cause.getMessage());
-            }
-            throw new IllegalArgumentException("Persistence error occurred, but cause is null");
+            throw new IllegalArgumentException("Persistence error: " + (cause != null ? cause.getMessage() : "Unknown cause"));
         } catch (Exception e) {
             throw new IllegalArgumentException("Unexpected error occurred: " + (e.getMessage() != null ? e.getMessage() : "Unknown error"));
         }
+
+        // 注册成功后生成 JWT 并返回
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("username", user.getUsername());
+        claims.put("role", user.getRole());
+        claims.put("building", user.getBuilding()); // 添加楼号
+        claims.put("dormitory", user.getDormitory()); // 添加宿舍号
+        return JwtUtils.generateToken(claims, user.getId()); // 使用 userId 作为 JWT 的 subject
     }
 
     /**
      * 用户登录，返回 JWT 令牌
      *
-     * @param username
-     * @param password
-     * @return
+     * @param username   用户名
+     * @param password   密码
+     * @param building   楼号
+     * @param dormitory  宿舍号
+     * @return JWT 令牌
      */
-    public String loginUser(String username, String password) {
+    public String loginUser(String username, String password, Integer building, Integer dormitory) {
+        // 验证用户名和密码
         if (authenticateUser(username, password)) {
-            // 生成 JWT 令牌
-            Map<String, Object> claims = new HashMap<>();
-            claims.put("username", username);
+            User user = findUserByUsername(username); // 获取完整用户信息
 
-            return Jwts.builder()
-                    .setClaims(claims)
-                    .setSubject(username)
-                    .setIssuedAt(new Date())
-                    .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 令牌有效期一天
-                    .signWith(SECRET_KEY)
-                    .compact();
+            // 校验楼号和宿舍号是否匹配
+            if (!building.equals(user.getBuilding()) || !dormitory.equals(user.getDormitory())) {
+                throw new IllegalArgumentException("Building or dormitory does not match");
+            }
+
+            // 生成 JWT 的 claims
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("username", user.getUsername());
+            claims.put("role", user.getRole());
+            claims.put("building", building);
+            claims.put("dormitory", dormitory);
+
+            // 调用 JwtUtils 生成 JWT
+            String jwtToken = JwtUtils.generateToken(claims, user.getId()); // 使用现有逻辑生成 JWT
+
+            // 解析 JWT 并生成 Authentication
+            String usernameFromClaims = (String) claims.get("username");
+            String roleFromClaims = (String) claims.get("role");
+            List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(roleFromClaims));
+
+            // 创建并设置 Authentication 到 SecurityContext
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    usernameFromClaims, null, authorities
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            // 返回生成的 JWT
+            return jwtToken;
         }
+
         throw new IllegalArgumentException("Invalid username or password");
     }
+
 
     /**
      * 根据用户 ID 获取用户信息
@@ -191,7 +215,7 @@ public class UserService {
      * @param username
      * @return
      */
-    private User findUserByUsername(String username) {
+    public User findUserByUsername(String username) {
         return userMapper.findUserByUsername(username);
     }
 
@@ -205,5 +229,33 @@ public class UserService {
     }
 
 
+    public boolean adminExists() {
+        int count = userMapper.findAdminCount();
+        System.out.println("Admin count: " + count); // 日志验证
+        return count > 0;
+    }
 
+
+
+    // 仅管理员可以调用
+//    @PreAuthorize("hasAuthority('ADMIN')")
+    public List<User> getAllUsers() {
+        return userMapper.findAllNonAdminUsers();
+    }
+
+    /**
+     * 根据楼号和宿舍号查询非管理员用户
+     * @param building 楼号
+     * @param dormitory 宿舍号
+     * @return 非管理员用户列表
+     */
+//    @PreAuthorize("hasAuthority('ADMIN')")
+    public List<User> getUsersByBuildingAndRoom(String building, String dormitory) {
+        return userMapper.findUsersByBuildingAndRoom(building, dormitory);
+    }
+
+    public boolean deleteUserById(String id) {
+        int rowsAffected = userMapper.deleteUserById(id);
+        return rowsAffected > 0;
+    }
 }

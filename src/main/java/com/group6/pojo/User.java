@@ -22,5 +22,7 @@ public class User {
     private String email;  // 邮箱
 //    @Column(name = "avatar_path", length = 1024)
     private String avatar;  // 用户头像路径
-
+    private String role;
+    private Integer building;
+    private Integer dormitory;
 }

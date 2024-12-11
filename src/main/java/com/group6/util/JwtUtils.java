@@ -86,6 +86,12 @@ public class JwtUtils {
     public static class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         @Override
+        protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+            // 排除无需验证的路径
+            String path = request.getServletPath();
+            return path.equals("/users/login") || path.equals("/users/register"); // 登录和注册接口跳过过滤
+        }
+        @Override
         protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
                 throws ServletException, IOException {
 
@@ -140,4 +146,3 @@ public class JwtUtils {
 
 
 }
-

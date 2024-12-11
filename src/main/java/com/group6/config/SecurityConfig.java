@@ -43,24 +43,26 @@ public class SecurityConfig {
                 .and()
                 .csrf().disable() // 禁用 CSRF（如有需要，可开启）
                 .authorizeHttpRequests(authorize -> authorize
-                        // 登录和注册接口允许匿名访问
-                        .requestMatchers("/users/login", "/users/register").permitAll()
+                                // 登录和注册接口允许匿名访问
+                                .requestMatchers("/users/login", "/users/register").permitAll()
 
 //                         仅允许具有 `ADMIN` 和 `USER` 权限的用户访问
-                        .requestMatchers("/users/profile").hasAnyAuthority("ADMIN", "USER")
+                                .requestMatchers("/users/profile").hasAnyAuthority("ADMIN", "USER")
 
 //                         仅允许 `ADMIN` 权限用户访问
-                        .requestMatchers("/users/admin", "/users/by-room","/users/admin/*").hasAuthority("ADMIN")
+                                .requestMatchers("/users/admin", "/users/by-room","/users/admin/*").hasAuthority("ADMIN")
 
 //                        .anyRequest().authenticated() // 默认需要认证
-                        // 其他请求需要认证后访问
-                        .anyRequest().permitAll()
+                                // 其他请求需要认证后访问
+                                .anyRequest().permitAll()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 设置无状态会话
                 )
                 .addFilterBefore(new JwtUtils.JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class); // 注册自定义过滤器
 
+
+        System.out.println("[SecurityConfig] Security filter chain configured successfully.");
         return http.build();
     }
 

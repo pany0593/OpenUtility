@@ -3,7 +3,14 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://120.24.176.40:3300/OpenUtility?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
-    password: 123456
+    password: ALi123eCs
+
+#  jpa:
+#    hibernate:
+#      ddl-auto: create-drop
+
+
+
 #logging:
 #  level:
 #    web: debug

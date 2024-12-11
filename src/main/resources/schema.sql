@@ -15,15 +15,15 @@ MySQL - 8.0.32 : Database - openutility
 /*Table structure for table `user` */
 
 CREATE TABLE `user` (
-    `id` VARCHAR(30) NOT NULL,
-    `username` VARCHAR(50) NOT NULL,
-    `password` VARCHAR(500) NOT NULL,
-    `email` VARCHAR(100),
-    `avatar` VARCHAR(1024),
-    `user_role` VARCHAR(20) NOT NULL DEFAULT 'ADMIN',
-    `building` INT NULL DEFAULT 0, -- 楼号
-    `dormitory` INT NULL DEFAULT 0, -- 宿舍号
-    PRIMARY KEY (`id`)
+                        `id` VARCHAR(30) NOT NULL,
+                        `username` VARCHAR(50) NOT NULL,
+                        `password` VARCHAR(500) NOT NULL,
+                        `email` VARCHAR(100),
+                        `avatar` VARCHAR(1024),
+                        `role` VARCHAR(20) NOT NULL DEFAULT 'ADMIN',
+                        `building` INT NULL DEFAULT 0, -- 楼号
+                        `dormitory` INT NULL DEFAULT 0, -- 宿舍号
+                        PRIMARY KEY (`id`)
 #     UNIQUE KEY `unique_building_dormitory` (`building`, `dormitory`) -- 保证楼号和宿舍号唯一
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -31,22 +31,21 @@ CREATE TABLE `user` (
 /*Table structure for table `water_electricity_bill` */
 
 CREATE TABLE `water_electricity_bill` (
-      `id` VARCHAR(30) NOT NULL,
-      `year` INT NOT NULL,
-      `month` INT NOT NULL,
-      `days` INT NOT NULL,
-      `building` INT NOT NULL, -- 楼号
-      `dormitory` INT NOT NULL, -- 宿舍号
-      `electricity_usage` DECIMAL(10,2) NOT NULL,
-      `electricity_cost` DECIMAL(10,2) NOT NULL,
-      `water_usage` DECIMAL(10,2) NOT NULL,
-      `water_cost` DECIMAL(10,2) NOT NULL,
-      `total_cost` DECIMAL(10,2) NOT NULL,
-      PRIMARY KEY (`id`)
+                                          `id` VARCHAR(30) NOT NULL,
+                                          `year` INT NOT NULL,
+                                          `month` INT NOT NULL,
+                                          `days` INT NOT NULL,
+                                          `building` INT NOT NULL, -- 楼号
+                                          `dormitory` INT NOT NULL, -- 宿舍号
+                                          `electricity_usage` DECIMAL(10,2) NOT NULL,
+                                          `electricity_cost` DECIMAL(10,2) NOT NULL,
+                                          `water_usage` DECIMAL(10,2) NOT NULL,
+                                          `water_cost` DECIMAL(10,2) NOT NULL,
+                                          `total_cost` DECIMAL(10,2) NOT NULL,
+                                          PRIMARY KEY (`id`)
 #       FOREIGN KEY (`building`, `dormitory`) REFERENCES `user` (`building`, `dormitory`)
 #           ON DELETE CASCADE ON UPDATE CASCADE -- 如果 user 表的记录变动，账单表自动更新或删除
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
 /*Table structure for post */
 
 CREATE TABLE `article` (

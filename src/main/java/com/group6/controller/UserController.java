@@ -28,9 +28,18 @@ public class UserController {
      */
     @PostMapping("/register")
     public Result registerUser(@RequestBody User user) {
-        userService.registerUser(user);
-        return Result.success(user);
+        try {
+            userService.registerUser(user);
+            return Result.success(user);
+        } catch (IllegalArgumentException e) {
+            // 捕获非法参数异常，并返回错误信息
+            return Result.error(e.getMessage());
+        } catch (Exception e) {
+            // 捕获其他未预见的异常，并返回通用错误信息
+            return Result.error("Unexpected error occurred: " + e.getMessage());
+        }
     }
+
 
 
     /**

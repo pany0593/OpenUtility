@@ -34,6 +34,9 @@ public interface BillMapper {
 
     @Select("SELECT * FROM water_electricity_bill")
     List<Bill> selectAllBill();
+    @Select("SELECT * FROM water_electricity_bill WHERE year = #{bill.year} AND month = #{bill.month} ORDER BY total_cost DESC")
+    List<Bill> rangeByMonth(@Param("bill") Bill bill);
+
 
     @Select("SELECT SUM(electricity_cost + water_cost) FROM bill WHERE dormitory = #{dormitory} AND " +
             "(year * 12 + month) BETWEEN (#{startYear} * 12 + #{startMonth}) AND (#{endYear} * 12 + #{endMonth})")
@@ -144,4 +147,5 @@ public interface BillMapper {
             "ON u.building = b.building AND u.dormitory = b.dormitory " +
             "WHERE u.id = #{userId} AND b.id = #{billId}")
     Map<String, Object> getUserAndBillInfo(@Param("userId") String userId, @Param("billId") String billId);
+
 }

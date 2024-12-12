@@ -3,9 +3,9 @@ package com.group6.service;
 import com.group6.pojo.*;
 import com.group6.mapper.ArticleMapper;
 import com.group6.mapper.CommentMapper;
-import com.group6.util.ThreadLocalUtil;
 import com.group6.mapper.FavoriteMapper;
 import com.group6.util.SnowFlakeUtils;
+import com.group6.util.ProfileUtil;
 
 import java.sql.SQLOutput;
 import java.util.ArrayList;
@@ -26,13 +26,13 @@ public class PostService {
     @Autowired
     private FavoriteMapper favoriteMapper;
     @Autowired
-    private ThreadLocalUtil threadLocalUtil;
-    @Autowired
     private SnowFlakeUtils snowFlakeUtils;
     @Autowired
     private UserService userService;
     @Autowired
     private View error;
+    @Autowired
+    private ProfileUtil profileUtil;
 
     //生成文章id
     public String createArticleId() {
@@ -41,7 +41,6 @@ public class PostService {
 
     //创建文章
     public int createArticle(Article article) {
-//        String authorId= (String) threadLocalUtil.get("userId");
         try {
             int x = articleMapper.insertArticle(article);
             return x;
@@ -148,7 +147,7 @@ public class PostService {
     }
 
     public List<Comment> getFavoriteCommentByUserId() {
-        return favoriteMapper.getFavoriteCommentByUserId(String.valueOf(threadLocalUtil.get("userId")));
+        return favoriteMapper.getFavoriteCommentByUserId(profileUtil.get().getId());
     }
 
     public Article findByArticleId(String articleId) {
@@ -157,7 +156,8 @@ public class PostService {
     }
 
     public List<Article> getLikesByUserId() {
-        String userId = String.valueOf(threadLocalUtil.get("userId"));//从token获取用户id？怎么从这里获取用户id？
+//        String userId = String.valueOf(threadLocalUtil.get("userId"));//从token获取用户id？怎么从这里获取用户id？
+        String userId = profileUtil.get().getId();
         List<Favorite> favorites = favoriteMapper.getFavoriteArticleByUserId(userId);
         List<Article> articles = new ArrayList<>();
         for (Favorite favorite : favorites) {
@@ -172,12 +172,12 @@ public class PostService {
 
     public void likeArticle(String articleId) {
         articleMapper.likeArticle(articleId);
-        favoriteMapper.addFavoriteArticle(String.valueOf(threadLocalUtil.get("userId")),articleId);
+        favoriteMapper.addFavoriteArticle(profileUtil.get().getId(),articleId);
     }
 
     public void likeComment(String commentId) {
         commentMapper.likeComment(commentId);
-        favoriteMapper.addFavoriteComment(String.valueOf(threadLocalUtil.get("userId")),commentId);
+        favoriteMapper.addFavoriteComment(profileUtil.get().getId(),commentId);
     }
 
 /*    public String getNameById(String authorId) {

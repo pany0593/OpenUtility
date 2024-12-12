@@ -1,11 +1,8 @@
 package com.group6.controller;
 
-import com.group6.pojo.Result;
+import com.group6.pojo.*;
+import com.group6.util.ProfileUtil;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import com.group6.pojo.Article;
-import com.group6.pojo.Comment;
-import com.group6.pojo.ArticleList;
 import com.group6.service.PostService;
 import com.group6.response.GetArticleListResponse;
 
@@ -21,6 +18,9 @@ public class PostController {
 
     @Autowired
     private PostService postService;
+
+    @Autowired
+    private ProfileUtil profileUtil;
 
     private Integer pagesPerPage =4;//设置文章列表为每页4篇文章
 
@@ -43,7 +43,6 @@ public class PostController {
     //删帖(done)
     @DeleteMapping("/article_delete")//done
     public Result article_delete(@RequestBody Article article) {
-
         try {
             if (postService.deleteArticle(article)) {
                 return Result.success();
@@ -69,6 +68,7 @@ public class PostController {
 
     //点赞文章(done)//如何获取进行点赞操作的用户id？
     //在文章查看界面点赞
+
     @PostMapping("/article_like")
     public Result likeArticle(@RequestBody Article article0) {
         if (article0.getArticleId() == null || article0.getArticleId().isEmpty()) {

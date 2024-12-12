@@ -39,11 +39,24 @@ public class PostService {
         return "AR"+ snowFlakeUtils.nextId();
     }
 
+    //生成公告id
+    public String createNoticeId() {
+        return "NO"+snowFlakeUtils.nextId();
+    }
+
     //创建文章
     public int createArticle(Article article) {
         try {
-            int x = articleMapper.insertArticle(article);
-            return x;
+            return articleMapper.insertArticle(article);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    //创建公告
+    public int createNotice(Article article) {
+        try {
+            return articleMapper.insertNotice(article);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -66,6 +79,7 @@ public class PostService {
         comment.setCommentId(commentId);
         String CM = "CM";
         String AR = "AR";
+        String NO = "NO";
 
         //比较fatherId是否是articleId来确认是一级还是二级评论
         if (comment.getFatherId() == null) {
@@ -78,6 +92,8 @@ public class PostService {
             }else if ((comment.getFatherId()).startsWith(AR)){
 //                System.out.println("get in 1");
                 commentMapper.add_level1_Comment(comment);
+            } else if ((comment.getFatherId()).startsWith(NO)){
+                return "Invalid";
             }
         } catch (Exception e) {
             throw new IllegalArgumentException("fail to compare");

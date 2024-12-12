@@ -24,20 +24,36 @@ public class PostController {
 
     private Integer pagesPerPage =4;//设置文章列表为每页4篇文章
 
-    //发帖(done)
+    //发帖/公告(done)
     @PostMapping("/article_add")//done
     public Result article_add(@RequestBody Article article) {
 //        System.out.println(article.getDesc());
-        try {
-            article.setArticleId(postService.createArticleId());
-            if(postService.createArticle(article) != 0){
-                return Result.success(article.getArticleId());
-            } else {
-                return Result.error("fail to add article");
+        String identification = profileUtil.get().getRole();
+        if (identification.equals("USER")) {                    //发帖
+            try {
+                article.setArticleId(postService.createArticleId());
+                if(postService.createArticle(article) != 0){
+                    return Result.success(article.getArticleId());
+                } else {
+                    return Result.error("fail to add article");
+                }
+            } catch (Exception e) {
+                return Result.error(e.getMessage());
             }
-        } catch (Exception e) {
-            return Result.error(e.getMessage());
+        } else {                                                //发公告
+            try {
+                //生成公告id并自动装填
+                article.setArticleId(postService.createNoticeId());
+                if(postService.createArticle(article) != 0){
+                    return Result.success(article.getArticleId());
+                } else {
+                    return Result.error("fail to add notice");
+                }
+            } catch (Exception e) {
+                return Result.error(e.getMessage());
+            }
         }
+
     }
 
     //删帖(done)
@@ -93,6 +109,9 @@ public class PostController {
     public Result comment_add(@RequestBody Comment comment) {
         try{
             String commentId = postService.addComment(comment);
+            if (commentId.equals("Invalid")) {//错误的在公告上添加评论
+                throw new Exception();
+            }
             return Result.success(postService.findByCommentId(commentId));
         } catch (Exception e) {
             return Result.error("Failed to add comment");

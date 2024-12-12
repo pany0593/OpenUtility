@@ -11,6 +11,10 @@ public interface ArticleMapper {//Article表
             "VALUES (#{article.articleId}, #{article.authorId}, #{article.authorName}, #{article.title}, #{article.desc}, #{article.content})")
     int insertArticle(@Param("article") Article article);//增加文章
 
+    @Insert("INSERT INTO notice (articleId, authorId, authorName, title, `desc`, content) " +
+            "VALUES (#{article.articleId}, #{article.authorId}, #{article.authorName}, #{article.title}, #{article.desc}, #{article.content})")
+    int insertNotice(@Param("article") Article article);//增加文章
+
     @Delete("DELETE FROM article WHERE articleId = #{article.articleId}")
     int deleteArticle(@Param("article") Article article);//删除文章
 

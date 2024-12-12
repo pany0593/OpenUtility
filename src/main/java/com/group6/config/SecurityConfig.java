@@ -1,18 +1,30 @@
 package com.group6.config;
 
+import com.group6.util.JwtUtils;
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.OncePerRequestFilter;
 
+import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 @Configuration
@@ -27,18 +39,36 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // 设置跨域配置
-                .csrf(AbstractHttpConfigurer::disable) // 禁用 CSRF 保护
+                .cors() // 启用跨域配置
+                .and()
+                .csrf().disable() // 禁用 CSRF（如有需要，可开启）
                 .authorizeHttpRequests(authorize -> authorize
-                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // 允许预检请求
-//                        .requestMatchers("/bill/add").permitAll() // 开放 /bill/add 路由
-//                        .anyRequest().authenticated() // 其他路由需要认证
-                                .anyRequest().permitAll()
-                );
-//                .httpBasic(); // 如果需要简单的 HTTP 基础认证
+                                // 登录和注册接口允许匿名访问
+                                .requestMatchers("/users/login", "/users/register").permitAll()
 
+//                         仅允许具有 `ADMIN` 和 `USER` 权限的用户访问
+                                .requestMatchers("/users/profile").hasAnyAuthority("ADMIN", "USER")
+
+//                         仅允许 `ADMIN` 权限用户访问
+                                .requestMatchers("/users/admin", "/users/by-room","/users/admin/*").hasAuthority("ADMIN")
+
+//                        .anyRequest().authenticated() // 默认需要认证
+                                // 其他请求需要认证后访问
+                                .anyRequest().permitAll()
+                )
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 设置无状态会话
+                )
+                .addFilterBefore(new JwtUtils.JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class); // 注册自定义过滤器
+
+
+        System.out.println("[SecurityConfig] Security filter chain configured successfully.");
         return http.build();
     }
+
+
+
+
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -52,5 +82,6 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration); // 应用于所有路由
         return source;
     }
+
 
 }

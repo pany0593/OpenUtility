@@ -4,11 +4,3 @@ spring:
     url: jdbc:mysql://120.24.176.40:3300/OpenUtility?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
     password: 123456
-#logging:
-#  level:
-#    web: debug
-#    hikari:
-#      auto-commit: true  # 启用自动提交
-#mybatis:
-#  configuration:
-#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

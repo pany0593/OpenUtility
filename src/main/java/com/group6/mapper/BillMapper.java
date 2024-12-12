@@ -13,7 +13,10 @@ import java.util.Map;
 public interface BillMapper {
 
     @Select("SELECT * FROM water_electricity_bill WHERE id = #{id}")
-    User findBillById(@Param("id") String id);
+    Bill findBillById(@Param("id") String id);
+
+    @Select("SELECT * FROM water_electricity_bill WHERE building = #{bill.building} AND dormitory = #{bill.dormitory} AND year = #{bill.year} AND month = #{bill.month}")
+    Bill findBillByDormitory(@Param("bill") Bill bill);
 
     @Insert("INSERT INTO water_electricity_bill (id,year,month,days,building,dormitory,electricity_usage,electricity_cost,water_usage,water_cost,total_cost) " +
             "VALUES (#{bill.id}, #{bill.year}, #{bill.month}, #{bill.days}, #{bill.building}, #{bill.dormitory}, #{bill.electricity_usage}, #{bill.electricity_cost}, #{bill.water_usage}, #{bill.water_cost}, #{bill.total_cost})")

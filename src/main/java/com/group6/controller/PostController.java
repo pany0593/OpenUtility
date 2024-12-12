@@ -1,8 +1,8 @@
 package com.group6.controller;
 
+import com.group6.pojo.Result;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import com.group6.pojo.Result;
 import com.group6.pojo.Article;
 import com.group6.pojo.Comment;
 import com.group6.pojo.ArticleList;

@@ -76,26 +76,14 @@ public class BillController {
         }
     }
 
-    @GetMapping("/count_dormitory")
-    public Result<BigDecimal> countDormitory(
-            @RequestParam int dormitory, @RequestParam int startYear,
-            @RequestParam int startMonth, @RequestParam int endYear,
-            @RequestParam int endMonth) {
-        return Result.success(billService.countByDormitory(dormitory, startYear, startMonth, endYear, endMonth));
+    @PostMapping("/rangeByMonth")
+    public Result<List<Bill>> rangeByMonth(@RequestBody Bill bill) {
+        try {
+            List<Bill> bills = billService.rangeByMonth(bill);
+            return Result.success(bills);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
     }
 
-    @GetMapping("/count_building")
-    public Result<BigDecimal> countBuilding(
-            @RequestParam int building, @RequestParam int startYear,
-            @RequestParam int startMonth, @RequestParam int endYear,
-            @RequestParam int endMonth) {
-        return Result.success(billService.countByBuilding(building, startYear, startMonth, endYear, endMonth));
-    }
-
-    @GetMapping("/count_school")
-    public Result<BigDecimal> countSchool(
-            @RequestParam int startYear, @RequestParam int startMonth,
-            @RequestParam int endYear, @RequestParam int endMonth) {
-        return Result.success(billService.countBySchool(startYear, startMonth, endYear, endMonth));
-    }
 }

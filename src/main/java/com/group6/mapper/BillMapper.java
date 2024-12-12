@@ -34,21 +34,7 @@ public interface BillMapper {
 
     @Select("SELECT * FROM water_electricity_bill")
     List<Bill> selectAllBill();
+    @Select("SELECT * FROM water_electricity_bill WHERE year = #{bill.year} AND month = #{bill.month} ORDER BY total_cost DESC")
+    List<Bill> rangeByMonth(@Param("bill") Bill bill);
 
-    @Select("SELECT SUM(electricity_cost + water_cost) FROM bill WHERE dormitory = #{dormitory} AND " +
-            "(year * 12 + month) BETWEEN (#{startYear} * 12 + #{startMonth}) AND (#{endYear} * 12 + #{endMonth})")
-    BigDecimal sumElectricityAndWaterCostByDormitory(@Param("dormitory") int dormitory,
-                                                     @Param("startYear") int startYear, @Param("startMonth") int startMonth,
-                                                     @Param("endYear") int endYear, @Param("endMonth") int endMonth);
-
-    @Select("SELECT SUM(electricity_cost + water_cost) FROM bill WHERE building = #{building} AND " +
-            "(year * 12 + month) BETWEEN (#{startYear} * 12 + #{startMonth}) AND (#{endYear} * 12 + #{endMonth})")
-    BigDecimal sumElectricityAndWaterCostByBuilding(@Param("building") int building,
-                                                    @Param("startYear") int startYear, @Param("startMonth") int startMonth,
-                                                    @Param("endYear") int endYear, @Param("endMonth") int endMonth);
-
-    @Select("SELECT SUM(electricity_cost + water_cost) FROM bill WHERE " +
-            "(year * 12 + month) BETWEEN (#{startYear} * 12 + #{startMonth}) AND (#{endYear} * 12 + #{endMonth})")
-    BigDecimal sumElectricityAndWaterCostBySchool(@Param("startYear") int startYear, @Param("startMonth") int startMonth,
-                                                  @Param("endYear") int endYear, @Param("endMonth") int endMonth);
 }

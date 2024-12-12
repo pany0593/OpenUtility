@@ -2,6 +2,7 @@ package com.group6.service;
 
 import com.group6.mapper.BillMapper;
 import com.group6.pojo.Bill;
+import com.group6.pojo.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -80,15 +81,8 @@ public class BillService {
         return billMapper.selectAllBill();
     }
 
-    public BigDecimal countByDormitory(int dormitory, int startYear, int startMonth, int endYear, int endMonth) {
-        return billMapper.sumElectricityAndWaterCostByDormitory(dormitory, startYear, startMonth, endYear, endMonth);
+    public List<Bill> rangeByMonth(Bill bill) {
+        return billMapper.rangeByMonth(bill);
     }
 
-    public BigDecimal countByBuilding(int building, int startYear, int startMonth, int endYear, int endMonth) {
-        return billMapper.sumElectricityAndWaterCostByBuilding(building, startYear, startMonth, endYear, endMonth);
-    }
-
-    public BigDecimal countBySchool(int startYear, int startMonth, int endYear, int endMonth) {
-        return billMapper.sumElectricityAndWaterCostBySchool(startYear, startMonth, endYear, endMonth);
-    }
 }

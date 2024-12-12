@@ -30,22 +30,36 @@ CREATE TABLE `user` (
 
 /*Table structure for table `water_electricity_bill` */
 
-CREATE TABLE `water_electricity_bill` (
-                                          `id` VARCHAR(30) NOT NULL,
-                                          `year` INT NOT NULL,
-                                          `month` INT NOT NULL,
-                                          `days` INT NOT NULL,
-                                          `building` INT NOT NULL, -- 楼号
-                                          `dormitory` INT NOT NULL, -- 宿舍号
-                                          `electricity_usage` DECIMAL(10,2) NOT NULL,
-                                          `electricity_cost` DECIMAL(10,2) NOT NULL,
-                                          `water_usage` DECIMAL(10,2) NOT NULL,
-                                          `water_cost` DECIMAL(10,2) NOT NULL,
-                                          `total_cost` DECIMAL(10,2) NOT NULL,
-                                          PRIMARY KEY (`id`)
-#       FOREIGN KEY (`building`, `dormitory`) REFERENCES `user` (`building`, `dormitory`)
-#           ON DELETE CASCADE ON UPDATE CASCADE -- 如果 user 表的记录变动，账单表自动更新或删除
+CREATE TABLE water_electricity_bill (
+                                        id VARCHAR(30) NOT NULL,
+                                        year INT NOT NULL,
+                                        month INT NOT NULL,
+                                        days INT NOT NULL,
+                                        building INT NOT NULL, -- 楼号
+                                        dormitory INT NOT NULL, -- 宿舍号
+                                        electricity_usage DECIMAL(10,2) NOT NULL,
+                                        electricity_cost DECIMAL(10,2) NOT NULL,
+                                        water_usage DECIMAL(10,2) NOT NULL,
+                                        water_cost DECIMAL(10,2) NOT NULL,
+                                        total_cost DECIMAL(10,2) NOT NULL,
+                                        PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE bill_appeals (
+                              id VARCHAR(30) PRIMARY KEY, -- 申诉记录 ID
+                              bill_id VARCHAR(30) NOT NULL, -- 对应的账单 ID
+                              user_id VARCHAR(30) NOT NULL, -- 用户 ID
+                              reason TEXT NOT NULL, -- 申诉理由
+                              status VARCHAR(20) NOT NULL DEFAULT 'PENDING', -- 状态：PENDING/APPROVED/REJECTED
+                              reject_reason TEXT, -- 拒绝理由
+                              created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- 申诉提交时间
+                              resolved_time TIMESTAMP NULL, -- 处理时间
+                              FOREIGN KEY (bill_id) REFERENCES water_electricity_bill (id) ON DELETE CASCADE, -- 与账单表关联
+                              FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE -- 与用户表关联
+);
+
+
+
 /*Table structure for post */
 
 CREATE TABLE `article` (

@@ -2,12 +2,12 @@ package com.group6.service;
 
 import com.group6.mapper.BillMapper;
 import com.group6.pojo.Bill;
-import com.group6.pojo.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -81,8 +81,60 @@ public class BillService {
         return billMapper.selectAllBill();
     }
 
-    public List<Bill> rangeByMonth(Bill bill) {
-        return billMapper.rangeByMonth(bill);
+    public BigDecimal countByDormitory(int dormitory, int startYear, int startMonth, int endYear, int endMonth) {
+        return billMapper.sumElectricityAndWaterCostByDormitory(dormitory, startYear, startMonth, endYear, endMonth);
     }
 
+    public BigDecimal countByBuilding(int building, int startYear, int startMonth, int endYear, int endMonth) {
+        return billMapper.sumElectricityAndWaterCostByBuilding(building, startYear, startMonth, endYear, endMonth);
+    }
+
+    public BigDecimal countBySchool(int startYear, int startMonth, int endYear, int endMonth) {
+        return billMapper.sumElectricityAndWaterCostBySchool(startYear, startMonth, endYear, endMonth);
+    }
+
+    /**
+     * 提交账单申诉
+     */
+    public void submitAppeal(String billId, String userId, String reason) {
+        billMapper.insertAppeal(billId, userId, reason);
+    }
+
+    /**
+     * 查询所有账单申诉记录
+     */
+    public List<Map<String, Object>> listAppeals(String status) {
+        if (status == null || status.isEmpty()) {
+            // 查询所有申诉记录
+            return billMapper.listAllAppeals();
+        } else {
+            // 查询指定状态的申诉记录
+            return billMapper.listAppealsByStatus(status);
+        }
+    }
+
+    /**
+     * 同意账单申诉并更新账单
+     */
+    public void approveAppeal(String appealId, Bill updatedBill) {
+        if (updatedBill == null) {
+            throw new IllegalArgumentException("Updated bill data must be provided.");
+        }
+        // 更新账单信息
+        billMapper.updateBill(updatedBill);
+        
+        // 更新申诉状态为已批准
+        billMapper.approveAppeal(appealId);
+    }
+
+    /**
+     * 拒绝账单申诉
+     */
+    public void rejectAppeal(String appealId, String rejectReason) {
+        if (rejectReason == null || rejectReason.isEmpty()) {
+            throw new IllegalArgumentException("Reject reason must be provided.");
+        }
+        // 更新申诉状态为已拒绝并记录拒绝理由
+        billMapper.rejectAppeal(appealId, rejectReason);
+    }
 }

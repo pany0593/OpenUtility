@@ -1,6 +1,7 @@
 package com.group6.controller;
 
 import com.group6.pojo.Result;
+import com.group6.util.UserProfileUtil;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -63,26 +64,13 @@ public class UserController {
     @GetMapping("/profile")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
     public Result getUserProfile() {
-        // 从 SecurityContextHolder 获取当前用户的 Authentication 对象
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication != null && authentication.isAuthenticated()) {
-            // 从 Authentication 获取当前用户的 principal 对象
-            Object principal = authentication.getPrincipal();
-
-            // 如果 principal 是 User 类型，直接返回用户对象
-            if (principal instanceof User) {
-                return Result.success(principal);
-            }
-            if (principal instanceof String userId) {
-                User user = userService.getUserById(userId); // 从数据库获取用户信息
-                return Result.success(user);
-            }
-
+        try {
+            // 调用工具类方法获取当前用户信息
+            User user = UserProfileUtil.getUserProfile();
+            return Result.success(user);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
         }
-
-        // 如果未认证或未找到用户，返回错误信息
-        return Result.error("User not authenticated or not found");
     }
 
 

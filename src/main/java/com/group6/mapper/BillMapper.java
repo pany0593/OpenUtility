@@ -37,4 +37,83 @@ public interface BillMapper {
     @Select("SELECT * FROM water_electricity_bill WHERE year = #{bill.year} AND month = #{bill.month} ORDER BY total_cost DESC")
     List<Bill> rangeByMonth(@Param("bill") Bill bill);
 
+    /**
+     * 插入账单申诉记录
+     */
+    @Insert("INSERT INTO bill_appeals (id, bill_id, user_id, reason, status, created_time) " +
+            "VALUES (SUBSTRING(UUID(), 1, 30), #{billId}, #{userId}, #{reason}, 'PENDING', NOW())")
+    void insertAppeal(@Param("billId") String billId, @Param("userId") String userId, @Param("reason") String reason);
+
+    /**
+     * 查询所有账单申诉记录
+     */
+    @Select("SELECT a.id AS appeal_id, " +
+            "u.username AS user_name, " +
+            "u.building, " +
+            "u.dormitory, " +
+            "b.year, " +
+            "b.month, " +
+            "b.water_cost, " +
+            "b.electricity_cost, " +
+            "a.reason, " +
+            "a.created_time, " +
+            "a.status, " +
+            "a.reject_reason " +
+            "FROM bill_appeals a " +
+            "JOIN water_electricity_bill b ON a.bill_id = b.id " +
+            "JOIN user u ON a.user_id = u.id " +
+            "ORDER BY a.created_time DESC")
+    List<Map<String, Object>> listAllAppeals();
+
+    /**
+     * 按状态查询账单申诉记录
+     */
+    @Select("SELECT a.id AS appeal_id, " +
+            "u.username AS user_name, " +
+            "u.building, " +
+            "u.dormitory, " +
+            "b.year, " +
+            "b.month, " +
+            "b.water_cost, " +
+            "b.electricity_cost, " +
+            "a.reason, " +
+            "a.created_time, " +
+            "a.status, " +
+            "a.reject_reason " +
+            "FROM bill_appeals a " +
+            "JOIN water_electricity_bill b ON a.bill_id = b.id " +
+            "JOIN user u ON a.user_id = u.id " +
+            "WHERE a.status = #{status} " +
+            "ORDER BY a.created_time DESC")
+    List<Map<String, Object>> listAppealsByStatus(@Param("status") String status);
+
+    /**
+     * 批准申诉
+     */
+    @Update("UPDATE bill_appeals " +
+            "SET status = 'APPROVED', " +
+            "reject_reason = NULL, " +
+            "resolved_time = NOW() " +
+            "WHERE id = #{appealId}")
+    void approveAppeal(@Param("appealId") String appealId);
+
+    /**
+     * 拒绝申诉
+     */
+    @Update("UPDATE bill_appeals " +
+            "SET status = 'REJECTED', " +
+            "reject_reason = #{rejectReason}, " +
+            "resolved_time = NOW() " +
+            "WHERE id = #{appealId}")
+    void rejectAppeal(@Param("appealId") String appealId, @Param("rejectReason") String rejectReason);
+
+    /**
+     * 查询用户和账单信息
+     */
+    @Select("SELECT u.username, u.email, b.year, b.month, b.water_cost, b.electricity_cost " +
+            "FROM user u " +
+            "JOIN water_electricity_bill b " +
+            "ON u.building = b.building AND u.dormitory = b.dormitory " +
+            "WHERE u.id = #{userId} AND b.id = #{billId}")
+    Map<String, Object> getUserAndBillInfo(@Param("userId") String userId, @Param("billId") String billId);
 }

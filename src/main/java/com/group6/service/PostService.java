@@ -180,20 +180,30 @@ public class PostService {
         return articleMapper.getNoticeNum();
     }
 
-    public List<Comment> getFavoriteCommentByUserId() {
-        return favoriteMapper.getFavoriteCommentByUserId(UserProfileUtil.getUserProfile().getId());
-    }
-
     public Article findByArticleId(String articleId) {
         Article article = articleMapper.findByArticleId(articleId);
         return article;
     }
 
-    public List<Article> getLikesByUserId() {
+    //获取用户点赞评论列表
+    public List<Comment> getFavoriteCommentByUserId() {
         String userId = UserProfileUtil.getUserProfile().getId();
-        List<Favorite> favorites = favoriteMapper.getFavoriteArticleByUserId(userId);
+        List<FavoriteComment> favorites = favoriteMapper.getFavoriteCommentByUserId(userId);
+        List<Comment> comments = new ArrayList<>();
+        for (FavoriteComment favorite : favorites) {
+            comments.add(commentMapper.findByCommentId(favorite.getCommentId()));
+        }
+        return comments;
+    }
+
+    //获取用户点赞文章列表
+    public List<Article> getLikesByUserId() {
+        System.out.println("1");
+        String userId = UserProfileUtil.getUserProfile().getId();
+        System.out.println("2");
+        List<FavoriteArticle> favorites = favoriteMapper.getFavoriteArticleByUserId(userId);
         List<Article> articles = new ArrayList<>();
-        for (Favorite favorite : favorites) {
+        for (FavoriteArticle favorite : favorites) {
             articles.add(articleMapper.findByArticleId(favorite.getArticleId()));
         }
         return articles;
@@ -203,9 +213,12 @@ public class PostService {
         articleMapper.addClicks(articleId);
     }
 
+    //点赞文章
     public void likeArticle(String articleId) {
         articleMapper.likeArticle(articleId);
+        System.out.println("6");
         favoriteMapper.addFavoriteArticle(UserProfileUtil.getUserProfile().getId(),articleId);
+        System.out.println("7");
     }
 
     public void likeComment(String commentId) {

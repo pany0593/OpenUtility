@@ -5,15 +5,13 @@ import com.group6.mapper.ArticleMapper;
 import com.group6.mapper.CommentMapper;
 import com.group6.mapper.FavoriteMapper;
 import com.group6.util.SnowFlakeUtils;
-import com.group6.util.ProfileUtil;
+import com.group6.util.UserProfileUtil;
 
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.View;
 
 @Component
@@ -31,19 +29,30 @@ public class PostService {
     private UserService userService;
     @Autowired
     private View error;
-    @Autowired
-    private ProfileUtil profileUtil;
 
     //生成文章id
     public String createArticleId() {
         return "AR"+ snowFlakeUtils.nextId();
     }
 
+    //生成公告id
+    public String createNoticeId() {
+        return "NO"+snowFlakeUtils.nextId();
+    }
+
     //创建文章
     public int createArticle(Article article) {
         try {
-            int x = articleMapper.insertArticle(article);
-            return x;
+            return articleMapper.insertArticle(article);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    //创建公告
+    public int createNotice(Article article) {
+        try {
+            return articleMapper.insertNotice(article);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -54,9 +63,19 @@ public class PostService {
         return articleMapper.deleteArticle(article) > 0;
     }
 
+    //删除公告
+    public boolean deleteNotice(Article article) {
+        return articleMapper.deleteNotice(article) > 0;
+    }
+
     //更新文章
     public boolean updateArticle(Article article) {
         return articleMapper.updateArticle(article) > 0;
+    }
+
+    //更新公告
+    public boolean updateNotice(Article article) {
+        return articleMapper.updateNotice(article) > 0;
     }
 
 
@@ -66,6 +85,7 @@ public class PostService {
         comment.setCommentId(commentId);
         String CM = "CM";
         String AR = "AR";
+        String NO = "NO";
 
         //比较fatherId是否是articleId来确认是一级还是二级评论
         if (comment.getFatherId() == null) {
@@ -78,6 +98,8 @@ public class PostService {
             }else if ((comment.getFatherId()).startsWith(AR)){
 //                System.out.println("get in 1");
                 commentMapper.add_level1_Comment(comment);
+            } else if ((comment.getFatherId()).startsWith(NO)){
+                return "Invalid";
             }
         } catch (Exception e) {
             throw new IllegalArgumentException("fail to compare");
@@ -132,6 +154,7 @@ public class PostService {
         return comments;
     }
 
+    //文章列表
     public List<Article> getList(ArticleList articlelist, Integer pagesPerPage) {
         List<Article> articles;
         if(articlelist.getSort() == 1){//sort = 1是根据文章发表时间倒序排列，其他值是根据点击量倒序排序。
@@ -142,12 +165,23 @@ public class PostService {
         return articles;
     }
 
+    //公告列表
+    public List<Article> getList_notice(ArticleList articlelist, Integer pagesPerPage) {
+        List<Article> notices;
+        notices = articleMapper.getListByTime_notice((articlelist.getPage() - 1) * pagesPerPage, pagesPerPage);
+        return notices;
+    }
+
     public int getArticleNum() {
         return articleMapper.getArticleNum();
     }
 
+    public int getNoticeNum() {
+        return articleMapper.getNoticeNum();
+    }
+
     public List<Comment> getFavoriteCommentByUserId() {
-        return favoriteMapper.getFavoriteCommentByUserId(profileUtil.get().getId());
+        return favoriteMapper.getFavoriteCommentByUserId(UserProfileUtil.getUserProfile().getId());
     }
 
     public Article findByArticleId(String articleId) {
@@ -156,8 +190,7 @@ public class PostService {
     }
 
     public List<Article> getLikesByUserId() {
-//        String userId = String.valueOf(threadLocalUtil.get("userId"));//从token获取用户id？怎么从这里获取用户id？
-        String userId = profileUtil.get().getId();
+        String userId = UserProfileUtil.getUserProfile().getId();
         List<Favorite> favorites = favoriteMapper.getFavoriteArticleByUserId(userId);
         List<Article> articles = new ArrayList<>();
         for (Favorite favorite : favorites) {
@@ -172,18 +205,14 @@ public class PostService {
 
     public void likeArticle(String articleId) {
         articleMapper.likeArticle(articleId);
-        favoriteMapper.addFavoriteArticle(profileUtil.get().getId(),articleId);
+        favoriteMapper.addFavoriteArticle(UserProfileUtil.getUserProfile().getId(),articleId);
     }
 
     public void likeComment(String commentId) {
         commentMapper.likeComment(commentId);
-        favoriteMapper.addFavoriteComment(profileUtil.get().getId(),commentId);
+        favoriteMapper.addFavoriteComment(UserProfileUtil.getUserProfile().getId(),commentId);
     }
 
-/*    public String getNameById(String authorId) {
-        return userService.getNameById(authorId);                                       //由UserService实现
-    }
-*/
 }
 
 

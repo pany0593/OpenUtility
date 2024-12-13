@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 
 @RestController
@@ -26,7 +25,6 @@ public class BillController {
             return Result.error(e.getMessage());
         }
     }
-
     @PostMapping("/delete")
     public Result delete(@RequestBody Bill bill) {
         try {
@@ -59,7 +57,7 @@ public class BillController {
         }
     }
 
-    @GetMapping("/getDataByDormitory")
+    @PostMapping("/getDataByDormitory")
     public Result<Bill> getDataByDormitory(@RequestBody Bill bbill) {
         try {
             Bill bill = billService.getBillByDormitory(bbill);
@@ -68,8 +66,7 @@ public class BillController {
             return Result.error(e.getMessage());
         }
     }
-
-    @GetMapping("/getAllData")
+    @PostMapping("/getAllData")
     public Result<List<Bill>> getAllData() {
         try {
             List<Bill> bills = billService.getAllBill();
@@ -79,77 +76,14 @@ public class BillController {
         }
     }
 
-    @GetMapping("/count_dormitory")
-    public Result<BigDecimal> countDormitory(
-            @RequestParam int dormitory, @RequestParam int startYear,
-            @RequestParam int startMonth, @RequestParam int endYear,
-            @RequestParam int endMonth) {
-        return Result.success(billService.countByDormitory(dormitory, startYear, startMonth, endYear, endMonth));
-    }
-
-    @GetMapping("/count_building")
-    public Result<BigDecimal> countBuilding(
-            @RequestParam int building, @RequestParam int startYear,
-            @RequestParam int startMonth, @RequestParam int endYear,
-            @RequestParam int endMonth) {
-        return Result.success(billService.countByBuilding(building, startYear, startMonth, endYear, endMonth));
-    }
-
-    @GetMapping("/count_school")
-    public Result<BigDecimal> countSchool(
-            @RequestParam int startYear, @RequestParam int startMonth,
-            @RequestParam int endYear, @RequestParam int endMonth) {
-        return Result.success(billService.countBySchool(startYear, startMonth, endYear, endMonth));
-    }
-
-    /**
-     * 提交账单申诉
-     */
-    @PostMapping("/appeal/submit")
-    public Result submitAppeal(
-            @RequestParam String billId,
-            @RequestParam String userId,
-            @RequestParam String reason) {
+    @PostMapping("/rangeByMonth")
+    public Result<List<Bill>> rangeByMonth(@RequestBody Bill bill) {
         try {
-            billService.submitAppeal(billId, userId, reason);
-            return Result.success("Appeal submitted successfully.");
+            List<Bill> bills = billService.rangeByMonth(bill);
+            return Result.success(bills);
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
     }
 
-    /**
-     * 查询账单申诉记录
-     */
-    @GetMapping("/appeal/list")
-    public Result<List<Map<String, Object>>> listAppeals(@RequestParam(required = false) String status) {
-        try {
-            List<Map<String, Object>> appeals = billService.listAppeals(status);
-            return Result.success(appeals);
-        } catch (Exception e) {
-            return Result.error(e.getMessage());
-        }
-    }
-
-    /**
-     * 管理员处理账单申诉
-     */
-    @PostMapping("/appeal/resolve")
-    public Result resolveAppeal(
-            @RequestParam String appealId,
-            @RequestParam boolean isApproved,
-            @RequestBody(required = false) Bill updatedBill,
-            @RequestParam(required = false) String rejectReason) {
-        try {
-            if (isApproved) {
-                billService.approveAppeal(appealId, updatedBill);
-                return Result.success("Appeal approved and bill updated successfully.");
-            } else {
-                billService.rejectAppeal(appealId, rejectReason);
-                return Result.success("Appeal rejected with reason: " + rejectReason);
-            }
-        } catch (Exception e) {
-            return Result.error(e.getMessage());
-        }
-    }
 }

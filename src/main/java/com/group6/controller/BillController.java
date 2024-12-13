@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -86,4 +87,54 @@ public class BillController {
         }
     }
 
+    /**
+     * 提交账单申诉
+     */
+    @PostMapping("/appeal/submit")
+    public Result submitAppeal(
+            @RequestParam String billId,
+            @RequestParam String userId,
+            @RequestParam String reason) {
+        try {
+            billService.submitAppeal(billId, userId, reason);
+            return Result.success("Appeal submitted successfully.");
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 查询账单申诉记录
+     */
+    @GetMapping("/appeal/list")
+    public Result<List<Map<String, Object>>> listAppeals(@RequestParam(required = false) String status) {
+        try {
+            List<Map<String, Object>> appeals = billService.listAppeals(status);
+            return Result.success(appeals);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 管理员处理账单申诉
+     */
+    @PostMapping("/appeal/resolve")
+    public Result resolveAppeal(
+            @RequestParam String appealId,
+            @RequestParam boolean isApproved,
+            @RequestBody(required = false) Bill updatedBill,
+            @RequestParam(required = false) String rejectReason) {
+        try {
+            if (isApproved) {
+                billService.approveAppeal(appealId, updatedBill);
+                return Result.success("Appeal approved and bill updated successfully.");
+            } else {
+                billService.rejectAppeal(appealId, rejectReason);
+                return Result.success("Appeal rejected with reason: " + rejectReason);
+            }
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
 }

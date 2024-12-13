@@ -77,16 +77,14 @@ CREATE TABLE `article` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `notice` (
-                           `articleId` varchar(30) NOT NULL,
+                           `noticeId` varchar(30) NOT NULL,
                            `title` varchar(255) NOT NULL,
                            `content` text NOT NULL,
                            `authorId` varchar(30) NOT NULL,
                            `authorName` varchar(30) NOT NULL,
                            `desc` varchar(30) NOT NULL,
                            `createTime` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-                           `likes` int DEFAULT 0,
-                           `clicks` int DEFAULT 0,
-                           PRIMARY KEY (`articleId`),
+                           PRIMARY KEY (`noticeId`),
                            FOREIGN KEY (`authorId`) REFERENCES `user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 

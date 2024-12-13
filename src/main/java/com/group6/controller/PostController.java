@@ -1,10 +1,10 @@
 package com.group6.controller;
 
 import com.group6.pojo.*;
-import com.group6.util.ProfileUtil;
 import org.springframework.web.bind.annotation.PostMapping;
 import com.group6.service.PostService;
 import com.group6.response.GetArticleListResponse;
+import com.group6.response.GetNoticeListResponse;
 
 import java.util.Comparator;
 import java.util.List;
@@ -19,41 +19,37 @@ public class PostController {
     @Autowired
     private PostService postService;
 
-    @Autowired
-    private ProfileUtil profileUtil;
 
     private Integer pagesPerPage =4;//设置文章列表为每页4篇文章
 
-    //发帖/公告(done)
+    //发帖(done)
     @PostMapping("/article_add")//done
     public Result article_add(@RequestBody Article article) {
-//        System.out.println(article.getDesc());
-        String identification = profileUtil.get().getRole();
-        if (identification.equals("USER")) {                    //发帖
-            try {
-                article.setArticleId(postService.createArticleId());
-                if(postService.createArticle(article) != 0){
-                    return Result.success(article.getArticleId());
-                } else {
-                    return Result.error("fail to add article");
-                }
-            } catch (Exception e) {
-                return Result.error(e.getMessage());
+        try {
+            article.setArticleId(postService.createArticleId());
+            if(postService.createArticle(article) != 0){
+                return Result.success(article.getArticleId());
+            } else {
+                return Result.error("fail to add article");
             }
-        } else {                                                //发公告
-            try {
-                //生成公告id并自动装填
-                article.setArticleId(postService.createNoticeId());
-                if(postService.createArticle(article) != 0){
-                    return Result.success(article.getArticleId());
-                } else {
-                    return Result.error("fail to add notice");
-                }
-            } catch (Exception e) {
-                return Result.error(e.getMessage());
-            }
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
         }
+    }
 
+    //发公告
+    @PostMapping("/notice_add")//done
+    public Result notice_add(@RequestBody Article article) {
+        try {
+            article.setArticleId(postService.createNoticeId());
+            if(postService.createNotice(article) != 0){
+                return Result.success(article.getArticleId());
+            } else {
+                return Result.error("fail to add notice");
+            }
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
     }
 
     //删帖(done)
@@ -64,6 +60,20 @@ public class PostController {
                 return Result.success();
             } else {
                 return Result.error("Failed to delete article");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    //删公告(done)
+    @DeleteMapping("/notice_delete")//done
+    public Result notice_delete(@RequestBody Article article) {
+        try {
+            if (postService.deleteNotice(article)) {
+                return Result.success();
+            } else {
+                return Result.error("Failed to delete notice");
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -82,9 +92,20 @@ public class PostController {
         }
     }
 
-    //点赞文章(done)//如何获取进行点赞操作的用户id？
-    //在文章查看界面点赞
+    //更新公告(done)
+    @PostMapping("/notice_update")//done
+    public Result notice_update(@RequestBody Article article) {
+        try {
+            postService.updateNotice(article);
+            return Result.success();
+        }
+        catch (Exception e) {
+            return Result.error("Failed to update notice");
+        }
+    }
 
+
+    //点赞文章//service层工具类要更换
     @PostMapping("/article_like")
     public Result likeArticle(@RequestBody Article article0) {
         if (article0.getArticleId() == null || article0.getArticleId().isEmpty()) {
@@ -104,7 +125,7 @@ public class PostController {
         return Result.success();
     }
 
-    //发表评论(done)//未添加验证fatherId是否是已存在的id
+    //发表评论(done)
     @PostMapping("/comment_add")//done
     public Result comment_add(@RequestBody Comment comment) {
         try{
@@ -152,7 +173,7 @@ public class PostController {
         return Result.error("Failed to delete comment");
     }
 
-    //点赞评论(done)
+    //点赞评论(未完成)
     @PostMapping("/comment_like")
     private Result likeComment(@RequestBody Comment comment0){
         Comment comment=postService.findByCommentId(comment0.getCommentId());
@@ -205,7 +226,6 @@ public class PostController {
         try {
             //获取文章数量
             int articleNum=postService.getArticleNum();
-
             //文章页数大于或小于极限
             if (articlelist.getPage() < 1 || articlelist.getPage() > (int) Math.ceil((double) articleNum / pagesPerPage)) {
                 return Result.error("page error");
@@ -224,4 +244,30 @@ public class PostController {
             return Result.error("fail to get article list");
         }
     }
+
+    //查看公告列表
+    @PostMapping("/notice_list_get")
+    public Result getList_notice(@RequestBody ArticleList articlelist) {
+        try {
+            //获取公告数量
+            int noticeNum=postService.getNoticeNum();
+            //公告页数大于或小于极限
+            if (articlelist.getPage() < 1 || articlelist.getPage() > (int) Math.ceil((double) noticeNum / pagesPerPage)) {
+                return Result.error("page error");
+            }
+            //生成公告列表
+            List<Article> notices = postService.getList_notice(articlelist, pagesPerPage);
+            //判断公告列表非空
+            if (notices == null || notices.isEmpty()) {
+                return Result.error("list is empty");
+            }
+
+            return Result.success(new GetNoticeListResponse(notices, (int) Math.ceil((double) noticeNum / pagesPerPage)));
+        } catch (Exception e){
+            return Result.error("fail to get notice list");
+        }
+    }
+
 }
+
+

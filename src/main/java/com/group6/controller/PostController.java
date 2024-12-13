@@ -105,7 +105,7 @@ public class PostController {
     }
 
 
-    //点赞文章//service层工具类要更换
+    //点赞文章(done)
     @PostMapping("/article_like")
     public Result likeArticle(@RequestBody Article article0) {
         if (article0.getArticleId() == null || article0.getArticleId().isEmpty()) {
@@ -116,6 +116,7 @@ public class PostController {
             return Result.error("Failed to find article : articleId do not exist");
         }
         List<Article> likesArticle = postService.getLikesByUserId();//获取该用户的点赞列表
+        System.out.println("444");
         for (Article tmpArticle : likesArticle) {
             if (tmpArticle.getArticleId().equals(article0.getArticleId())) {
                 return Result.error("Fail to like article : already liked");
@@ -173,7 +174,7 @@ public class PostController {
         return Result.error("Failed to delete comment");
     }
 
-    //点赞评论(未完成)
+    //点赞评论(done)
     @PostMapping("/comment_like")
     private Result likeComment(@RequestBody Comment comment0){
         Comment comment=postService.findByCommentId(comment0.getCommentId());
@@ -183,7 +184,7 @@ public class PostController {
         List<Comment> favoriteComments = postService.getFavoriteCommentByUserId();
         for (Comment tmpComment:favoriteComments) {
             if(tmpComment.getCommentId().equals(comment0.getCommentId())){
-                return Result.error("already liked");
+                return Result.error("Fail to like article : already liked");
             }
         }
         postService.likeComment(comment0.getCommentId());//点赞

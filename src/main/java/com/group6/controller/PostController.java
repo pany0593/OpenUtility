@@ -19,7 +19,6 @@ public class PostController {
     @Autowired
     private PostService postService;
 
-
     private Integer pagesPerPage =4;//设置文章列表为每页4篇文章
 
     //发帖(done)
@@ -192,7 +191,7 @@ public class PostController {
     }
 
 
-    //查看文章(done)//已修改
+    //查看文章(done)
     @PostMapping("/article_get")
     public Result getArticle(@RequestBody Article article0) {
         Article article = null;
@@ -203,6 +202,20 @@ public class PostController {
             return Result.error("fail to find article");
         }
         return Result.success(article);
+    }
+
+    //查看公告
+    @PostMapping("/notice_get")
+    public Result getNotice(@RequestBody Article notice0) {
+        Article notice = null;
+        try {
+            System.out.println("1");
+            notice = postService.findByNoticeId(notice0.getNoticeId());
+        } catch (Exception e) {
+            System.out.println("2");
+            return Result.error("fail to find notice");
+        }
+        return Result.success(notice);
     }
 
     //查看评论(done)

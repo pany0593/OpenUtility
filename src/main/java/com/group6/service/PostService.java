@@ -185,6 +185,11 @@ public class PostService {
         return article;
     }
 
+    public Article findByNoticeId(String noticeId) {
+        Article notice = articleMapper.findByNoticeId(noticeId);
+        return notice;
+    }
+
     //获取用户点赞评论列表
     public List<Comment> getFavoriteCommentByUserId() {
         String userId = UserProfileUtil.getUserProfile().getId();

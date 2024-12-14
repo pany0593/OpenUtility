@@ -28,7 +28,10 @@ public interface ArticleMapper {//Article表、notice表
     int updateNotice(@Param("notice")Article article);//修改公告
 
     @Select("SELECT articleId,title,authorId,authorName,`desc`,content,createTime,likes,clicks from article where articleId = #{articleId}")
-    Article findByArticleId(@Param("articleId") String articleId);//根据文章id返回文章搜索结果//已修改
+    Article findByArticleId(@Param("articleId") String articleId);//根据文章id返回文章具体内容
+
+    @Select("SELECT noticeId,title,authorId,authorName,`desc`,content,createTime from notice where noticeId = #{noticeId}")
+    Article findByNoticeId(@Param("noticeId") String noticeId);//根据公告id返回公告具体内容
 
     @Update("UPDATE article set likes = likes + 1 where articleId = #{articleId}")
     void likeArticle(@Param("articleId")String articleId);//点赞文章
